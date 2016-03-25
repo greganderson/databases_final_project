@@ -1,0 +1,6 @@
+.idea/
+*.iml
+out/
+test.sql
+*.swp
+*.class

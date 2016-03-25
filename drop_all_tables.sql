@@ -1,0 +1,12 @@
+set foreign_key_checks=0;
+drop table POI;
+drop table Keywords;
+drop table HasKeywords;
+drop table Users;
+drop table Trust;
+drop table Favorites;
+drop table VisitEvent;
+drop table Visit;
+drop table Feedback;
+drop table Rates;
+set foreign_key_checks=1;

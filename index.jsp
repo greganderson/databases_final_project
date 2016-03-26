@@ -11,9 +11,12 @@
 <!-- Bootstrap -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
 
+<!-- jQuery (necessary for Bootstraps JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
 <script LANGUAGE="javascript">
 
-function check_all_fields(form_obj){
+function check_all_fields(form_obj) {
 	alert(form_obj.searchAttribute.value+"='"+form_obj.attributeValue.value+"'");
 	if( form_obj.attributeValue.value == ""){
 		alert("Search field should be nonempty");
@@ -22,70 +25,65 @@ function check_all_fields(form_obj){
 	return true;
 }
 
+<!-- Toggling functions -->
+function showMain() {
+	$("#main_content").show();
+}
+function hideMain() {
+	$("#main_content").hide();
+}
+function showRegularUser() {
+	$("#regular_user_content").show();
+}
+function hideRegularUser() {
+	$("#regular_user_content").hide();
+}
+
+
 </script> 
 </head>
 <body>
-<h1>Welcome to the UTrack system!</h1>
-
 <%
 String username = request.getParameter("username");
-if(username == null){
 %>
-
-	<h3>Regular User:</h3>
-	<form name="user_search" method=get onsubmit="return check_all_fields(this)">
-		Username: <input type=text name="username">
-		Password: <input type=password name="password">
-		<input type=submit name="regular_user_submit">
-	</form>
-
-	<h3>Create new account:</h3>
-	<form name="user_search" method=get onsubmit="return check_all_fields(this)">
-		Username: <input type=text name="username">
-		<input type=submit name="create_new_account_submit">
-	</form>
-
-	<h3>Administrator:</h3>
-	<form name="user_search" method=get onsubmit="return check_all_fields(this)">
-		Username: <input type=text name="username">
-		Password: <input type=password name="password">
-		<input type=submit name="admin_submit">
-	</form>
+<%@ include file="main.jsp" %>
+<%@ include file="regular_user.jsp" %>
+<script>hideMain(); hideRegularUser();</script>
 
 <%
 
+if(username == null || username == ""){
+	%>
+	<script>showMain();</script>
+	<%
 } else {
-
 	String password = request.getParameter("password");
 
 	boolean is_admin = false;
 	if (request.getParameter("admin_submit") != null)
 		is_admin = true;
 
-	%>
-	Here is what I got: username = <%=username%>, password = <%=password%>, is_admin = <%=is_admin%>
-	<%
-
 	Connector connector = new Connector();
 	Starter main = new Starter();
 	if (!is_admin) {
-		//RegularUser user = new RegularUser(username);
-		//user.login(username, password, false, con.con);
+		RegularUser user = new RegularUser(username);
+		boolean success = user.login(username, password, false, connector.con);
+		if (success) {
+			%>
+			<script>hideMain(); showRegularUser();</script>
+			<%
+		}
+		else {
+			%>
+			<script>alert("Invalid username or password"); showMain();</script>
+			<%
+		}
 	}
-	%>
-	SQL results: <%=main.getTest(connector.stmt)%>
 	
-	<%
-	//Connector connector = new Connector();
-	//Order order = new Order();
-	
-	//connector.closeStatement();
-	//connector.closeConnection();
+	connector.closeConnection();
 }
 %>
 
-<!-- jQuery (necessary for Bootstraps JavaScript plugins) -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="js/bootstrap.min.js"></script>
 </body>

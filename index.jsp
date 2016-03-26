@@ -57,8 +57,8 @@ function showView(view) {
 <%!
 
 public String getUserInputPOINameJsp(User user, String question, Connection con) {
-	TreeSet<String> pois = user.getUserInputPOIName(con, question);
-	String result = "<div class=\"list-group\">";
+	TreeSet<String> pois = user.getUserInputPOIName(con);
+	String result = "<h2>" + question + "</h2><div class=\"list-group\">";
 	for (String poi : pois)
 		result += "<button class=\"list-group-item\" onclick=\"return this\">" + poi + "</button>";
 	return result + "<button class=\"list-group-item\">Exit</button></div>";

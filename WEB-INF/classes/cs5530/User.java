@@ -71,7 +71,7 @@ public class User {
         }
     }
 
-    public TreeSet<String> getUserInputPOIName(Connection con, String question) {
+    public TreeSet<String> getUserInputPOIName(Connection con) {
         TreeSet<String> pois = new TreeSet<>();
         try {
             Statement statement = con.createStatement();

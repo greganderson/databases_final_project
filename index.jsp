@@ -28,17 +28,20 @@ function check_all_fields(form_obj) {
 <!-- Toggling functions -->
 var MAIN = "MAIN";
 var REGULAR_USER = "REGULAR_USER";
+var ADMIN = "ADMIN";
 var NONE = "NONE";
 
 function showView(view) {
 	$("#main_content").hide();
 	$("#regular_user_content").hide();
+	$("#admin_content").hide();
 
 	if (view == MAIN)
 		$("#main_content").show();
 	else if (view == REGULAR_USER)
 		$("#regular_user_content").show();
-		
+	else if (view == ADMIN)
+		$("#admin_content").show();
 }
 
 </script> 
@@ -49,11 +52,10 @@ String username = request.getParameter("username");
 %>
 <%@ include file="main.jsp" %>
 <%@ include file="regular_user.jsp" %>
+<%@ include file="admin.jsp" %>
 <script>showView(NONE);</script>
 
 <%
-
-
 if(username == null || username == ""){
 	%>
 	<script>showView(MAIN);</script>
@@ -73,6 +75,20 @@ if(username == null || username == ""){
 		if (success) {
 			%>
 			<script>showView(REGULAR_USER);</script>
+			<%
+		}
+		else {
+			%>
+			<script>alert("Invalid username or password"); showView(MAIN);</script>
+			<%
+		}
+	}
+	else {
+		Admin user = new Admin(username);
+		boolean success = user.login(username, password, true, connector.con);
+		if (success) {
+			%>
+			<script>showView(ADMIN);</script>
 			<%
 		}
 		else {

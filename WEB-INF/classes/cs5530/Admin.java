@@ -11,6 +11,7 @@ import java.util.*;
  */
 public class Admin extends User {
 
+	private String username;
     private Utils.QuestionSizePair nameQSP;
     private Utils.QuestionSizePair addressQSP;
     private Utils.QuestionSizePair urlQSP;
@@ -20,7 +21,8 @@ public class Admin extends User {
     private Utils.QuestionSizePair hoursQSP;
     private Utils.QuestionSizePair categoryQSP;
 
-    public Admin() {
+    public Admin(String username) {
+		this.username = username;
         nameQSP = new Utils.QuestionSizePair("Name (e.g. Pizza Place): ", 50);
         addressQSP = new Utils.QuestionSizePair("Address (e.g. 123 S. 456 E. Beaver, UT 12345): ", 80);
         urlQSP = new Utils.QuestionSizePair("URL (e.g. www.mywebsitegoeshere.com): ", 50);

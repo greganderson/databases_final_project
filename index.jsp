@@ -26,19 +26,20 @@ function check_all_fields(form_obj) {
 }
 
 <!-- Toggling functions -->
-function showMain() {
-	$("#main_content").show();
-}
-function hideMain() {
-	$("#main_content").hide();
-}
-function showRegularUser() {
-	$("#regular_user_content").show();
-}
-function hideRegularUser() {
-	$("#regular_user_content").hide();
-}
+var MAIN = "MAIN";
+var REGULAR_USER = "REGULAR_USER";
+var NONE = "NONE";
 
+function showView(view) {
+	$("#main_content").hide();
+	$("#regular_user_content").hide();
+
+	if (view == MAIN)
+		$("#main_content").show();
+	else if (view == REGULAR_USER)
+		$("#regular_user_content").show();
+		
+}
 
 </script> 
 </head>
@@ -48,13 +49,14 @@ String username = request.getParameter("username");
 %>
 <%@ include file="main.jsp" %>
 <%@ include file="regular_user.jsp" %>
-<script>hideMain(); hideRegularUser();</script>
+<script>showView(NONE);</script>
 
 <%
 
+
 if(username == null || username == ""){
 	%>
-	<script>showMain();</script>
+	<script>showView(MAIN);</script>
 	<%
 } else {
 	String password = request.getParameter("password");
@@ -70,12 +72,12 @@ if(username == null || username == ""){
 		boolean success = user.login(username, password, false, connector.con);
 		if (success) {
 			%>
-			<script>hideMain(); showRegularUser();</script>
+			<script>showView(REGULAR_USER);</script>
 			<%
 		}
 		else {
 			%>
-			<script>alert("Invalid username or password"); showMain();</script>
+			<script>alert("Invalid username or password"); showView(MAIN);</script>
 			<%
 		}
 	}

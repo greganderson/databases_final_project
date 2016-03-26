@@ -3,22 +3,37 @@
 
 
 	<h3>Regular User:</h3>
-	<form name="user_search" method=get onsubmit="return check_all_fields(this)">
-		Username: <input type=text name="username">
-		Password: <input type=password name="password">
-		<input type=submit name="regular_user_submit">
+	<form role="form" name="user_search" method=get onsubmit="return check_all_fields(this)">
+		<div class="form-group">
+			<label for="username">Username:</label>
+			<input type="text" class="form-control" name="username">
+		</div>
+		<div class="form-group">
+			<label for="password">Password:</label>
+			<input type="password" class="form-control" name="password">
+		</div>
+		<button type="submit" class="btn btn-default" name="regular_user_submit">Submit</button>
 	</form>
 
 	<h3>Create new account:</h3>
-	<form name="user_search" method=get onsubmit="return check_all_fields(this)">
-		Username: <input type=text name="username">
-		<input type=submit name="create_new_account_submit">
+	<form role="form" name="user_search" method=get onsubmit="return check_all_fields(this)">
+		<div class="form-group">
+			<label for="username">Username:</label>
+			<input type="text" class="form-control" name="username">
+		</div>
+		<button type="submit" class="btn btn-default" name="create_new_account_submit">Submit</button>
 	</form>
 
 	<h3>Administrator:</h3>
-	<form name="user_search" method=get onsubmit="return check_all_fields(this)">
-		Username: <input type=text name="username">
-		Password: <input type=password name="password">
-		<input type=submit name="admin_submit">
+	<form for="form" name="user_search" method=get onsubmit="return check_all_fields(this)">
+		<div class="form-group">
+			<label for="username">Username:</label>
+			<input type="text" class="form-control" name="username">
+		</div>
+		<div class="form-group">
+			<label for="password">Password:</label>
+			<input type="password" class="form-control" name="password">
+		</div>
+		<button type="submit" class="btn btn-default" name="admin_submit">Submit</button>
 	</form>
 </div>

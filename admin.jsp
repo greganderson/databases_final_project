@@ -2,12 +2,12 @@
 <h1>Welcome <%=username%>!</h1>
 
 <div class="list-group">
-	<a href="#" class="list-group-item">Create new POI</a>
-	<a href="#" class="list-group-item">Update existing POI</a>
-	<a href="#" class="list-group-item">Top most trusted users</a>
-	<a href="#" class="list-group-item">Top most useful users</a>
-	<a href="#" class="list-group-item">Get degrees of separation between two users</a>
-	<a href="#" class="list-group-item">Logout</a>
+	<button class="list-group-item">Create new POI</button>
+	<button class="list-group-item">Update existing POI</button>
+	<button class="list-group-item">Top most trusted users</button>
+	<button class="list-group-item">Top most useful users</button>
+	<button class="list-group-item">Get degrees of separation between two users</button>
+	<button class="list-group-item">Logout</button>
 </div>
 
 </div>

@@ -1,4 +1,4 @@
-<%@ page language="java" import="cs5530.*" %>
+<%@ page language="java" import="cs5530.*,java.util.TreeSet,java.sql.*" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="en">
 <head>
@@ -27,19 +27,25 @@ function check_all_fields(form_obj) {
 
 <!-- Toggling functions -->
 var MAIN = "MAIN";
+<!-- Regular User -->
 var REGULAR_USER = "REGULAR_USER";
+var RECORD_A_VISIT = "RECORD_A_VISIT";
+<!-- Admin -->
 var ADMIN = "ADMIN";
 var NONE = "NONE";
 
 function showView(view) {
 	$("#main_content").hide();
 	$("#regular_user_content").hide();
+	$("#regular_record_a_visit").hide();
 	$("#admin_content").hide();
 
 	if (view == MAIN)
 		$("#main_content").show();
 	else if (view == REGULAR_USER)
 		$("#regular_user_content").show();
+	else if (view == RECORD_A_VISIT)
+		$("#regular_record_a_visit").show();
 	else if (view == ADMIN)
 		$("#admin_content").show();
 }
@@ -47,9 +53,27 @@ function showView(view) {
 </script> 
 </head>
 <body>
+
+<%!
+
+public String getUserInputPOINameJsp(User user, String question, Connection con) {
+	TreeSet<String> pois = user.getUserInputPOIName(con, question);
+	String result = "<div class=\"list-group\">";
+	for (String poi : pois)
+		result += "<button class=\"list-group-item\" onclick=\"return this\">" + poi + "</button>";
+	return result + "<button class=\"list-group-item\">Exit</button></div>";
+}
+
+%>
+
+
 <%
+// Global variables
+Connector connector = new Connector();
+User user = new User();
 String username = request.getParameter("username");
 %>
+
 <%@ include file="main.jsp" %>
 <%@ include file="regular_user.jsp" %>
 <%@ include file="admin.jsp" %>
@@ -67,10 +91,9 @@ if(username == null || username == ""){
 	if (request.getParameter("admin_submit") != null)
 		is_admin = true;
 
-	Connector connector = new Connector();
 	Starter main = new Starter();
 	if (!is_admin) {
-		RegularUser user = new RegularUser(username);
+		user = new RegularUser(username);
 		boolean success = user.login(username, password, false, connector.con);
 		if (success) {
 			%>
@@ -84,7 +107,7 @@ if(username == null || username == ""){
 		}
 	}
 	else {
-		Admin user = new Admin(username);
+		user = new Admin(username);
 		boolean success = user.login(username, password, true, connector.con);
 		if (success) {
 			%>

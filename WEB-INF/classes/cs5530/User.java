@@ -71,53 +71,20 @@ public class User {
         }
     }
 
-    public String getUserInputPOIName(Connection con, String question) {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        TreeMap<Integer, String> pois = new TreeMap<>();
-        String choice;
-        int c;
-
-        int i = 1;
+    public TreeSet<String> getUserInputPOIName(Connection con, String question) {
+        TreeSet<String> pois = new TreeSet<>();
         try {
             Statement statement = con.createStatement();
             ResultSet rs = statement.executeQuery("select name from POI");
             while (rs.next()) {
-                pois.put(i++, rs.getString(1));
+                pois.add(rs.getString(1));
             }
             statement.close();
             rs.close();
         } catch (SQLException e) {
             System.out.println("Could not execute getting list of POI's");
-            return "";
         }
 
-        // Get POI to update
-        while (true) {
-            System.out.println(question);
-            for (Map.Entry<Integer, String> entry : pois.entrySet()) {
-                System.out.println(entry.getKey() + ". " + entry.getValue());
-            }
-            System.out.println(i + ". Exit");
-
-            try {
-                while ((choice = in.readLine()) == null && choice.length() == 0) ;
-                c = Integer.parseInt(choice);
-            } catch (IOException e) {
-                continue;
-            }
-
-            if (!pois.containsKey(c) && c != i) {
-                System.out.println("Invalid POI");
-                continue;
-            }
-
-            break;
-        }
-
-        // They wanted to exit :(
-        if (c == i)
-            return "";
-
-        return pois.get(c);
+        return pois;
     }
 }

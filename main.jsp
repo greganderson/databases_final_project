@@ -2,6 +2,7 @@
 <h1>Welcome to the UTrack system!</h1>
 
 
+<!-- TODO: Change method to post probably -->
 	<h3>Regular User:</h3>
 	<form role="form" name="user_search" method=get onsubmit="return check_all_fields(this)">
 		<div class="form-group">

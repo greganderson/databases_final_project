@@ -36,18 +36,6 @@ public class Starter {
 
     public Starter() { }
 
-	public String getTest(Statement stmt) {
-		String result = "";
-		try {
-			String sql = "select name from POI";
-			ResultSet rs = stmt.executeQuery(sql);
-			while (rs.next())
-				result += rs.getString(1);
-		} catch (SQLException e) {
-			//
-		}
-		return result;
-	}
 	/*
     public static void main(String[] args) {
         Connector con = null;

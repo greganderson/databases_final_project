@@ -106,8 +106,8 @@ if(username == null || username == ""){
 		user = new RegularUser(username);
 		boolean success = user.login(username, password, false, connector.con);
 		if (success) {
-			session.setAttribute("username", "ted");
-			response.sendRedirect("regular_user.jsp");
+			session.setAttribute("username", username);
+			response.sendRedirect("regular_user/regular_user.jsp");
 		}
 		else {
 			%>

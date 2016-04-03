@@ -9,28 +9,14 @@
 <title>UTrack</title>
 
 <!-- Bootstrap -->
-<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="../css/bootstrap.min.css" rel="stylesheet">
 
 <!-- jQuery (necessary for Bootstraps JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-
-<script LANGUAGE="javascript">
-
-function check_all_fields(form_obj) {
-	alert(form_obj.searchAttribute.value+"='"+form_obj.attributeValue.value+"'");
-	if( form_obj.attributeValue.value == ""){
-		alert("Search field should be nonempty");
-		return false;
-	}
-	return true;
-}
-
-</script> 
 </head>
 <body>
 
 <%!
-
 public String getUserInputPOINameJsp(User user, String question, Connection con) {
 	TreeSet<String> pois = user.getUserInputPOIName(con);
 	String result = "<h2>" + question + "</h2><div class=\"list-group\">";
@@ -65,6 +51,6 @@ RegularUser user = new RegularUser(username);
 </div>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="js/bootstrap.min.js"></script>
+<script src="../js/bootstrap.min.js"></script>
 </body>
 </html>

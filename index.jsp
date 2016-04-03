@@ -25,31 +25,6 @@ function check_all_fields(form_obj) {
 	return true;
 }
 
-<!-- Toggling functions -->
-var MAIN = "MAIN";
-<!-- Regular User -->
-var REGULAR_USER = "REGULAR_USER";
-var RECORD_A_VISIT = "RECORD_A_VISIT";
-<!-- Admin -->
-var ADMIN = "ADMIN";
-var NONE = "NONE";
-
-function showView(view) {
-	$("#main_content").hide();
-	$("#regular_user_content").hide();
-	$("#regular_record_a_visit").hide();
-	$("#admin_content").hide();
-
-	if (view == MAIN)
-		$("#main_content").show();
-	else if (view == REGULAR_USER)
-		$("#regular_user_content").show();
-	else if (view == RECORD_A_VISIT)
-		$("#regular_record_a_visit").show();
-	else if (view == ADMIN)
-		$("#admin_content").show();
-}
-
 </script> 
 </head>
 <body>
@@ -60,7 +35,7 @@ public String getUserInputPOINameJsp(User user, String question, Connection con)
 	TreeSet<String> pois = user.getUserInputPOIName(con);
 	String result = "<h2>" + question + "</h2><div class=\"list-group\">";
 	for (String poi : pois)
-		result += "<button class=\"list-group-item\" onclick=\"return this\">" + poi + "</button>";
+		result += "<button class=\"list-group-item\" name=\"" + poi + "\">" + poi + "</button>";
 	return result + "<button class=\"list-group-item\">Exit</button></div>";
 }
 
@@ -68,24 +43,59 @@ public String getUserInputPOINameJsp(User user, String question, Connection con)
 
 
 <%
-// Global variables
-Connector connector = new Connector();
-User user = new User();
 String username = request.getParameter("username");
+
+if(username == null || username == ""){
 %>
 
-<%@ include file="main.jsp" %>
-<%@ include file="regular_user.jsp" %>
-<%@ include file="admin.jsp" %>
-<script>showView(NONE);</script>
+<div id="main_content">
+<h1>Welcome to the UTrack system!</h1>
+
+
+<!-- TODO: Change method to post probably -->
+	<h3>Regular User:</h3>
+	<form role="form" name="user_search" method=get onsubmit="return check_all_fields(this)">
+		<div class="form-group">
+			<label for="username">Username:</label>
+			<input type="text" class="form-control" name="username">
+		</div>
+		<div class="form-group">
+			<label for="password">Password:</label>
+			<input type="password" class="form-control" name="password">
+		</div>
+		<button type="submit" class="btn btn-default" name="regular_user_submit">Submit</button>
+	</form>
+
+	<h3>Create new account:</h3>
+	<form role="form" name="user_search" method=get onsubmit="return check_all_fields(this)">
+		<div class="form-group">
+			<label for="username">Username:</label>
+			<input type="text" class="form-control" name="username">
+		</div>
+		<button type="submit" class="btn btn-default" name="create_new_account_submit">Submit</button>
+	</form>
+
+	<h3>Administrator:</h3>
+	<form for="form" name="user_search" method=get onsubmit="return check_all_fields(this)">
+		<div class="form-group">
+			<label for="username">Username:</label>
+			<input type="text" class="form-control" name="username">
+		</div>
+		<div class="form-group">
+			<label for="password">Password:</label>
+			<input type="password" class="form-control" name="password">
+		</div>
+		<button type="submit" class="btn btn-default" name="admin_submit">Submit</button>
+	</form>
+</div>
 
 <%
-if(username == null || username == ""){
-	%>
-	<script>showView(MAIN);</script>
-	<%
 } else {
 	String password = request.getParameter("password");
+
+	Connector connector = new Connector();
+
+	User user;
 
 	boolean is_admin = false;
 	if (request.getParameter("admin_submit") != null)
@@ -96,13 +106,12 @@ if(username == null || username == ""){
 		user = new RegularUser(username);
 		boolean success = user.login(username, password, false, connector.con);
 		if (success) {
-			%>
-			<script>showView(REGULAR_USER);</script>
-			<%
+			session.setAttribute("username", "ted");
+			response.sendRedirect("regular_user.jsp");
 		}
 		else {
 			%>
-			<script>alert("Invalid username or password"); showView(MAIN);</script>
+			<script>alert("Invalid username or password");</script>
 			<%
 		}
 	}
@@ -111,12 +120,12 @@ if(username == null || username == ""){
 		boolean success = user.login(username, password, true, connector.con);
 		if (success) {
 			%>
-			<script>showView(ADMIN);</script>
+			<script>alert('TODO: Redirect to admin page');</script>
 			<%
 		}
 		else {
 			%>
-			<script>alert("Invalid username or password"); showView(MAIN);</script>
+			<script>alert("Invalid username or password");</script>
 			<%
 		}
 	}

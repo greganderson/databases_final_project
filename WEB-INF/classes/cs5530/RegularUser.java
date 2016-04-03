@@ -60,38 +60,25 @@ public class RegularUser extends User {
         return true;
     }
 
-    public String[] recordNewVisit(Connection con) {
+    public String[] recordNewVisit(Connection con, String poiName, String cost, String numOfPeople, String dateString) {
         String[] usernamePOINamePair = {username, ""};
-        String poiName = getUserInputPOIName(con, "Which POI did you visit:");
         if (poiName.isEmpty())
             return usernamePOINamePair;
         usernamePOINamePair[1] = poiName;
 
-        Utils.QuestionSizePair costQSP = new Utils.QuestionSizePair("Cost per person (whole number, e.g. $12): ", 100, "Invalid cost");
-        Utils.QuestionSizePair num_of_peopleQSP = new Utils.QuestionSizePair("Number of people (e.g. 6): ", 100, "Invalid number");
-        Utils.QuestionSizePair dateQSP = new Utils.QuestionSizePair("Date of visit (mm-dd-yyyy, e.g. 04-28-2016): ", 10, "Invalid date");
+		Date date;
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+		try {
+			date = new java.sql.Date(format.parse(dateString).getTime());
+		} catch (ParseException e) {
+			System.out.println("recordNewVisit: could not parse date");
+		}
 
-        String cost = Utils.getDollarAmount(costQSP);
-        String num_of_people = Utils.getUserInput(num_of_peopleQSP, true);
-        Date date;
-        DateFormat format = new SimpleDateFormat("MM-dd-yyyy", Locale.ENGLISH);
-        while (true) {
-            String dateString = Utils.getUserInput(dateQSP, false);
-            try {
-                date = new java.sql.Date(format.parse(dateString).getTime());
-                break;
-            } catch (ParseException e) {
-                System.out.println(dateQSP.errorMessage);
-                continue;
-            } catch (Exception e) {
-                System.out.println("A bad error happened here...");
-            }
-        }
-
+		/*
         String question = "Overview of visit:\n" +
                 "POI: " + poiName + "\n" +
                 "Cost per person: $" + cost + "\n" +
-                "Number of people: " + num_of_people + "\n" +
+                "Number of people: " + numOfPeople + "\n" +
                 "Date: " + date.toString() + "\n\n" +
                 "1. Save\n" +
                 "2. Cancel\n";
@@ -100,23 +87,24 @@ public class RegularUser extends User {
         while (true) {
             save = Utils.getUserInput(overviewQSP, true);
             if (save.equals("1")) {
-                recordNewVisitSql(con, poiName, cost, num_of_people, date);
+                recordNewVisitSql(con, poiName, cost, numOfPeople, date);
                 break;
             }
             else if (save.equals("2")) {
                 return new String[]{username, ""};
             }
         }
+		*/
 
         return usernamePOINamePair;
     }
 
-    private void recordNewVisitSql(Connection con, String poiName, String cost, String num_of_people, Date date) {
+    public void recordNewVisitSql(Connection con, String poiName, String cost, String numOfPeople, Date date) {
         try {
-            String sql = "insert into VisitEvent (cost, num_of_people) values (?, ?)";
+            String sql = "insert into VisitEvent (cost, numOfPeople) values (?, ?)";
             PreparedStatement preparedStatement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, Integer.parseInt(cost));
-            preparedStatement.setInt(2, Integer.parseInt(num_of_people));
+            preparedStatement.setInt(2, Integer.parseInt(numOfPeople));
             preparedStatement.executeUpdate();
 
             ResultSet rs = preparedStatement.getGeneratedKeys();
@@ -139,7 +127,9 @@ public class RegularUser extends User {
     }
 
     public void addFavoritePOI(Connection con) {
-        String poiName = getUserInputPOIName(con, "Which POI is your favorite:");
+		// TODO: FIX getUserInputPOIName
+        //String poiName = getUserInputPOIName(con, "Which POI is your favorite:");
+        String poiName = "sam98";
         if (poiName.isEmpty())
             return;
 
@@ -156,7 +146,9 @@ public class RegularUser extends User {
     }
 
     public void provideFeedback(Connection con) {
-        String poiName = getUserInputPOIName(con, "Which POI would you like to provide feedback for:");
+		// TODO: FIX getUserInputPOIName
+        //String poiName = getUserInputPOIName(con, "Which POI would you like to provide feedback for:");
+        String poiName = "sam98";
         if (poiName.isEmpty())
             return;
 

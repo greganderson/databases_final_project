@@ -32,12 +32,11 @@ String username = (String)session.getAttribute("username");
 RegularUser user = new RegularUser(username);
 %>
 
-
-<div id="regular_user_content">
+<div>
 <h1>Record a visit:</h1>
 
 <h3>POI</h3>
-<select class="form-control" required name="poiSelection">
+<select id="poiName" class="form-control" required>
 	<%
 	TreeSet<String> pois = user.getUserInputPOIName(connector.con);
 	for (String poi : pois)
@@ -45,6 +44,87 @@ RegularUser user = new RegularUser(username);
 	%>
 </select>
 
+<h3>Cost per person</h3>
+<form class="form-inline">
+	<div class="form-group">
+		<label class="sr-only" for="costPerPerson">Amount (in dollars)</label>
+		<div class="input-group">
+			<div class="input-group-addon">$</div>
+			<input type="text" class="form-control" id="costPerPerson" placeholder="Amount">
+		</div>
+	</div>
+</form>
+
+<h3>Number of people</h3>
+<div class="form-group">
+	<select id="numberOfPeople" class="form-control" required>
+		<%
+		for (int i = 1; i <= 50; i++)
+			out.println("<option>" + i + "</option>");
+		%>
+	</select>
+</div>
+
+<h3>Date</h3>
+<input id="date" type="date" class="col-xs-2">
+
+<br><br>
+<!-- Trigger the modal with a button -->
+<button type="button" class="btn btn-info btn-lg" onclick="displayConfirmation();">Open Modal</button>
+
+<!-- Modal -->
+<div id="confirmationModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Confirm Visit</h4>
+			</div>
+			<div class="modal-body">
+				<div id="confirmationContent"></div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" onclick="saveVisit();" data-dismiss="modal">Save</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<script>
+function displayConfirmation() {
+	var poiName = $('#poiName').val();
+	var costPerPerson = $('#costPerPerson').val();
+	var numberOfPeople = $('#numberOfPeople').val();
+	var date = $('#date').val();
+
+	if (costPerPerson == '' || date == '') {
+		alert('Please fill out all fields.');
+		return;
+	}
+
+	var results = '';
+	results += '<p><strong>POI:</strong> ' + poiName + '</p>';
+	results += '<p><strong>Cost per person:</strong> $' + costPerPerson + '</p>';
+	results += '<p><strong>Number of people:</strong> ' + numberOfPeople + '</p>';
+	results += '<p><strong>Date:</strong> ' + date + '</p>';
+	$('#confirmationContent').html(results);
+	$('#confirmationModal').modal({backdrop: 'static'});
+}
+
+function saveVisit() {
+	<%
+	String poiName = "";
+	String cost = "";
+	String numberOfPeople = "";
+	Date date;
+	//user.recordNewVisitSql(connector.con, poiName, cost, numberOfPeople, date);
+	%>
+}
+</script>
 
 </div>
 

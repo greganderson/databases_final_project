@@ -16,28 +16,35 @@
 </head>
 <body>
 
+<%!
+public String getUserInputPOINameJsp(User user, String question, Connection con) {
+	TreeSet<String> pois = user.getUserInputPOIName(con);
+	String result = "<h2>" + question + "</h2><div class=\"list-group\">";
+	for (String poi : pois)
+		result += "<button class=\"list-group-item\" name=\"" + poi + "\">" + poi + "</button>";
+	return result + "<button class=\"list-group-item\">Exit</button></div>";
+}
+%>
+
 <%
+Connector connector = new Connector();
 String username = (String)session.getAttribute("username");
 RegularUser user = new RegularUser(username);
 %>
 
 
 <div id="regular_user_content">
-<h1>Welcome <%=username%>!</h1>
+<h1>Record a visit:</h1>
 
-<form for="form" method="get">
-	<div class="list-group">
-		<button type="submit" class="list-group-item" action="record_a_visit.jsp" value="tester" formaction="record_a_visit.jsp">Record a visit</button>
-		<button class="list-group-item">Set a favorite POI</button>
-		<button class="list-group-item">Provide feedback for a POI</button>
-		<button class="list-group-item">Rate a feedback</button>
-		<button class="list-group-item">Declare a user as trusted or not</button>
-		<button class="list-group-item">Search for a POI</button>
-		<button class="list-group-item">See top rated feedback</button>
-		<button class="list-group-item">See cool statistics</button>
-		<button class="list-group-item">Logout</button>
-	</div>
-</form>
+<h3>POI</h3>
+<select class="form-control" required name="poiSelection">
+	<%
+	TreeSet<String> pois = user.getUserInputPOIName(connector.con);
+	for (String poi : pois)
+		out.println("<option>" + poi + "</option>");
+	%>
+</select>
+
 
 </div>
 

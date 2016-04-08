@@ -143,8 +143,7 @@ else {
 	String numberOfPeople = request.getParameter("numberOfPeopleSave");
 	String date = request.getParameter("dateSave");
 	boolean success = user.recordNewVisit(connector.con, poiName, cost, numberOfPeople, date);
-	out.println("<h1>Success: " + success + "</h1>");
-	//response.sendRedirect("regular_user.jsp");
+	response.sendRedirect("regular_user.jsp");
 }
 %>
 

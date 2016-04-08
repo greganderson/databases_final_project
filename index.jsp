@@ -29,19 +29,6 @@ function check_all_fields(form_obj) {
 </head>
 <body>
 
-<%!
-
-public String getUserInputPOINameJsp(User user, String question, Connection con) {
-	TreeSet<String> pois = user.getUserInputPOIName(con);
-	String result = "<h2>" + question + "</h2><div class=\"list-group\">";
-	for (String poi : pois)
-		result += "<button class=\"list-group-item\" name=\"" + poi + "\">" + poi + "</button>";
-	return result + "<button class=\"list-group-item\">Exit</button></div>";
-}
-
-%>
-
-
 <%
 String username = request.getParameter("username");
 

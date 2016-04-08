@@ -25,10 +25,10 @@ RegularUser user = new RegularUser(username);
 <div id="regular_user_content">
 <h1>Welcome <%=username%>!</h1>
 
-<form for="form" method="get">
+<form for="form" method="post">
 	<div class="list-group">
-		<button type="submit" class="list-group-item" action="record_a_visit.jsp" value="tester" formaction="record_a_visit.jsp">Record a visit</button>
-		<button class="list-group-item">Set a favorite POI</button>
+		<button type="submit" class="list-group-item" formaction="record_a_visit.jsp">Record a visit</button>
+		<button type="submit" class="list-group-item" formaction="set_favorite_poi.jsp">Set a favorite POI</button>
 		<button class="list-group-item">Provide feedback for a POI</button>
 		<button class="list-group-item">Rate a feedback</button>
 		<button class="list-group-item">Declare a user as trusted or not</button>

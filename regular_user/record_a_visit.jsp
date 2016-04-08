@@ -30,6 +30,9 @@ public String getUserInputPOINameJsp(User user, String question, Connection con)
 Connector connector = new Connector();
 String username = (String)session.getAttribute("username");
 RegularUser user = new RegularUser(username);
+
+String costPerPerson = request.getParameter("costPerPersonSave");
+if (costPerPerson == null || costPerPerson == "") {
 %>
 
 <div>
@@ -50,7 +53,7 @@ RegularUser user = new RegularUser(username);
 		<label class="sr-only" for="costPerPerson">Amount (in dollars)</label>
 		<div class="input-group">
 			<div class="input-group-addon">$</div>
-			<input type="text" class="form-control" id="costPerPerson" placeholder="Amount">
+			<input type="text" class="form-control" id="costPerPerson" placeholder="Amount" name="costPerPersonName">
 		</div>
 	</div>
 </form>
@@ -73,26 +76,32 @@ RegularUser user = new RegularUser(username);
 <button type="button" class="btn btn-info btn-lg" onclick="displayConfirmation();">Open Modal</button>
 
 <!-- Modal -->
-<div id="confirmationModal" class="modal fade" role="dialog">
-	<div class="modal-dialog">
+<form role="form" method="post" onsubmit="return saveVisit()">
+	<input type="hidden" id="poiNameSave" name="poiNameSave">
+	<input type="hidden" id="costPerPersonSave" name="costPerPersonSave">
+	<input type="hidden" id="numberOfPeopleSave" name="numberOfPeopleSave">
+	<input type="hidden" id="dateSave" name="dateSave">
+	<div id="confirmationModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
 
-		<!-- Modal content-->
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Confirm Visit</h4>
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Confirm Visit</h4>
+				</div>
+				<div class="modal-body">
+					<div id="confirmationContent"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-default">Save</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
 			</div>
-			<div class="modal-body">
-				<div id="confirmationContent"></div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" onclick="saveVisit();" data-dismiss="modal">Save</button>
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-			</div>
+
 		</div>
-
 	</div>
-</div>
+</form>
 
 <script>
 function displayConfirmation() {
@@ -116,17 +125,28 @@ function displayConfirmation() {
 }
 
 function saveVisit() {
-	<%
-	String poiName = "";
-	String cost = "";
-	String numberOfPeople = "";
-	Date date;
-	//user.recordNewVisitSql(connector.con, poiName, cost, numberOfPeople, date);
-	%>
+	$('#poiNameSave').val($('#poiName').val());
+	$('#costPerPersonSave').val($('#costPerPerson').val());
+	$('#numberOfPeopleSave').val($('#numberOfPeople').val());
+	$('#dateSave').val($('#date').val());
+	return true;
 }
 </script>
 
 </div>
+
+<%
+}
+else {
+	String poiName = request.getParameter("poiNameSave");
+	String cost = request.getParameter("costPerPersonSave");
+	String numberOfPeople = request.getParameter("numberOfPeopleSave");
+	String date = request.getParameter("dateSave");
+	boolean success = user.recordNewVisit(connector.con, poiName, cost, numberOfPeople, date);
+	out.println("<h1>Success: " + success + "</h1>");
+	//response.sendRedirect("regular_user.jsp");
+}
+%>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="../js/bootstrap.min.js"></script>

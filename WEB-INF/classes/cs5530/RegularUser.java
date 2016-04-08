@@ -60,48 +60,22 @@ public class RegularUser extends User {
         return true;
     }
 
-    public String[] recordNewVisit(Connection con, String poiName, String cost, String numOfPeople, String dateString) {
-        String[] usernamePOINamePair = {username, ""};
-        if (poiName.isEmpty())
-            return usernamePOINamePair;
-        usernamePOINamePair[1] = poiName;
-
-		Date date;
+    public boolean recordNewVisit(Connection con, String poiName, String cost, String numOfPeople, String dateString) {
+		Date date = null;
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 		try {
 			date = new java.sql.Date(format.parse(dateString).getTime());
 		} catch (ParseException e) {
 			System.out.println("recordNewVisit: could not parse date");
+			return false;
 		}
 
-		/*
-        String question = "Overview of visit:\n" +
-                "POI: " + poiName + "\n" +
-                "Cost per person: $" + cost + "\n" +
-                "Number of people: " + numOfPeople + "\n" +
-                "Date: " + date.toString() + "\n\n" +
-                "1. Save\n" +
-                "2. Cancel\n";
-        Utils.QuestionSizePair overviewQSP = new Utils.QuestionSizePair(question, 1, "Invalid answer");
-        String save;
-        while (true) {
-            save = Utils.getUserInput(overviewQSP, true);
-            if (save.equals("1")) {
-                recordNewVisitSql(con, poiName, cost, numOfPeople, date);
-                break;
-            }
-            else if (save.equals("2")) {
-                return new String[]{username, ""};
-            }
-        }
-		*/
-
-        return usernamePOINamePair;
+		return recordNewVisitSql(con, poiName, cost, numOfPeople, date);
     }
 
-    public void recordNewVisitSql(Connection con, String poiName, String cost, String numOfPeople, Date date) {
+    private boolean recordNewVisitSql(Connection con, String poiName, String cost, String numOfPeople, Date date) {
         try {
-            String sql = "insert into VisitEvent (cost, numOfPeople) values (?, ?)";
+            String sql = "insert into VisitEvent (cost, num_of_people) values (?, ?)";
             PreparedStatement preparedStatement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, Integer.parseInt(cost));
             preparedStatement.setInt(2, Integer.parseInt(numOfPeople));
@@ -121,8 +95,10 @@ public class RegularUser extends User {
             preparedStatement.setDate(4, date);
             preparedStatement.executeUpdate();
             preparedStatement.close();
+			return true;
         } catch (SQLException e) {
             System.out.println("Could not execute recording new visit");
+			return false;
         }
     }
 

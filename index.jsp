@@ -48,13 +48,13 @@ String username = request.getParameter("username");
 if(username == null || username == ""){
 %>
 
-<div id="main_content">
+<div>
 <h1>Welcome to the UTrack system!</h1>
 
 
 <!-- TODO: Change method to post probably -->
 	<h3>Regular User:</h3>
-	<form role="form" name="user_search" method=get onsubmit="return check_all_fields(this)">
+	<form role="form" name="user_search" method="post" onsubmit="return check_all_fields(this)">
 		<div class="form-group">
 			<label for="username">Username:</label>
 			<input type="text" class="form-control" name="username">
@@ -67,7 +67,7 @@ if(username == null || username == ""){
 	</form>
 
 	<h3>Create new account:</h3>
-	<form role="form" name="user_search" method=get onsubmit="return check_all_fields(this)">
+	<form role="form" name="user_search" method="post" onsubmit="return check_all_fields(this)">
 		<div class="form-group">
 			<label for="username">Username:</label>
 			<input type="text" class="form-control" name="username">
@@ -76,7 +76,7 @@ if(username == null || username == ""){
 	</form>
 
 	<h3>Administrator:</h3>
-	<form for="form" name="user_search" method=get onsubmit="return check_all_fields(this)">
+	<form for="form" name="user_search" method="post" onsubmit="return check_all_fields(this)">
 		<div class="form-group">
 			<label for="username">Username:</label>
 			<input type="text" class="form-control" name="username">

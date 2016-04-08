@@ -117,21 +117,8 @@ public class RegularUser extends User {
 		return true;
     }
 
-    public void provideFeedback(Connection con) {
-		// TODO: FIX getUserInputPOIName
-        //String poiName = getUserInputPOIName(con, "Which POI would you like to provide feedback for:");
-        String poiName = "sam98";
-        if (poiName.isEmpty())
-            return;
-
-        Utils.QuestionSizePair scoreQSP = new Utils.QuestionSizePair("Score (1-10): ", 10, "Invalid score");
-        Utils.QuestionSizePair textQSP = new Utils.QuestionSizePair("Comments (optional, limit 100 characters): ", 100, "Invalid comments");
-
-        int score = 0;
-        while (score < 1 || score > 10)
-            score = Integer.parseInt(Utils.getUserInput(scoreQSP, true));
-        String text = Utils.getUserInput(textQSP, false);
-
+    public boolean provideFeedback(Connection con, String poiName, String scoreString, String feedback) {
+		int score = Integer.parseInt(scoreString);
         try {
             // Check for duplicates
             String sql = "select count(*) from Feedback " +
@@ -143,7 +130,7 @@ public class RegularUser extends User {
             rs.first();
             if (rs.getInt(1) > 0) {
                 System.out.println("Could not provide feedback for this POI, feedback from this user already exists");
-                return;
+                return false;
             }
 
             // No duplicates, so insert feedback
@@ -153,12 +140,14 @@ public class RegularUser extends User {
             preparedStatement.setString(1, poiName);
             preparedStatement.setString(2, username);
             preparedStatement.setInt(3, score);
-            preparedStatement.setString(4, text);
+            preparedStatement.setString(4, feedback);
             preparedStatement.executeUpdate();
             preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Could not execute feedback creation");
+			return false;
         }
+		return true;
     }
 
     public void rateFeedback(Connection con) {

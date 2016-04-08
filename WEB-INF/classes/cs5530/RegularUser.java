@@ -102,13 +102,7 @@ public class RegularUser extends User {
         }
     }
 
-    public void addFavoritePOI(Connection con) {
-		// TODO: FIX getUserInputPOIName
-        //String poiName = getUserInputPOIName(con, "Which POI is your favorite:");
-        String poiName = "sam98";
-        if (poiName.isEmpty())
-            return;
-
+    public boolean addFavoritePOI(Connection con, String poiName) {
         try {
             String sql = "insert into Favorites values (?, (select pid from POI where name = ?))";
             PreparedStatement preparedStatement = con.prepareStatement(sql);
@@ -118,7 +112,9 @@ public class RegularUser extends User {
             preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Could not update favorite");
+			return false;
         }
+		return true;
     }
 
     public void provideFeedback(Connection con) {

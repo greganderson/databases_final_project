@@ -21,8 +21,9 @@ Connector connector = new Connector();
 String username = (String)session.getAttribute("username");
 RegularUser user = new RegularUser(username);
 
-String poiName = request.getParameter("poiName");
-if (poiName == null || poiName == "") {
+String fid = request.getParameter("fid");
+String rating = request.getParameter("rating");
+if (fid == null || fid == "") {
 %>
 
 <div>
@@ -30,38 +31,59 @@ if (poiName == null || poiName == "") {
 
 <div class="container">
 	<h3>Feedback</h3>
-	<table id="data" class="table">
-		<thead>
-			<tr>
-				<th>User</th>
-				<th>POI</th>
-				<th>Score</th>
-				<th>Feedback</th>
-				<th>Feedback Date</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%
-				FeedbackInformation result = user.rateFeedback(connector.con);
-				for (Map.Entry<Integer, FeedbackData> entry : result.feedbackDataSet.entrySet()) {
-					FeedbackData fbd = entry.getValue();
-					out.println("<tr class=\"clickable-row\" onmouseover=\"\" style=\"cursor: pointer;\"><td>" + result.usernameToFullName.get(fbd.username) + "</td>");
-					out.println("<td>" + result.pidToPOIName.get(fbd.pid) + "</td>");
-					out.println("<td>" + fbd.score + "</td>");
-					out.println("<td>" + fbd.text + "</td>");
-					out.println("<td>" + fbd.date + "</td></tr>");
-				}
-			%>
-		</tbody>
-	</table>
+	<form method="post" onsubmit="return saveRating()">
+		<table id="data" class="table">
+			<thead>
+				<tr>
+					<th>User</th>
+					<th>POI</th>
+					<th>Score</th>
+					<th>Feedback</th>
+					<th>Feedback Date</th>
+				</tr>
+			</thead>
+			<tbody>
+				<%
+					FeedbackInformation result = user.rateFeedback(connector.con);
+					for (Map.Entry<Integer, FeedbackData> entry : result.feedbackDataSet.entrySet()) {
+						FeedbackData fbd = entry.getValue();
+						out.println("<tr id=\"" + fbd.fid + "\" class=\"clickable-row\" onmouseover=\"\" style=\"cursor: pointer;\"><td>" + result.usernameToFullName.get(fbd.username) + "</td>");
+						out.println("<td>" + result.pidToPOIName.get(fbd.pid) + "</td>");
+						out.println("<td>" + fbd.score + "</td>");
+						out.println("<td>" + fbd.text + "</td>");
+						out.println("<td>" + fbd.date + "</td></tr>");
+					}
+				%>
+			</tbody>
+		</table>
+		<select id="ratingOption" class="form-control">
+			<option value="0">Useless</option>
+			<option value="1">Useful</option>
+			<option value="2">Very Useful</option>
+		</select>
+		<button type="submit" class="btn btn-default">Rate</button>
+		<input type="hidden" id="fid" name="fid">
+		<input type="hidden" id="rating" name="rating">
+	</form>
 </div>
 
 <script>
+selectedFeedback = -1
+function saveRating() {
+	if (selectedFeedback == -1)
+		return false;
+	$('#fid').val(selectedFeedback);
+	$('#rating').val($('#ratingOption').val());
+	return true;
+}
+
 $('#data').on('click', '.clickable-row', function(event) {
 	if($(this).hasClass('active')){
 		$(this).removeClass('active'); 
+		selectedFeedback = -1;
 	} else {
 		$(this).addClass('active').siblings().removeClass('active');
+		selectedFeedback = this.id;
 	}
 });
 </script>
@@ -72,6 +94,8 @@ $('#data').on('click', '.clickable-row', function(event) {
 }
 else {
 	out.println("<h1>OUTPUT PAGE</h1>");
+	out.println("<h1>" + fid + "</h1>");
+	out.println("<h1>" + rating + "</h1>");
 	//response.sendRedirect("regular_user.jsp");
 }
 %>

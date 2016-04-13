@@ -3,6 +3,7 @@ package cs5530;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 /**
  * Created by greg on 3/17/16.
@@ -72,24 +73,6 @@ public class Utils {
             this.question = question;
             this.maxSize = maxSize;
             this.errorMessage = errorMessage;
-        }
-    }
-
-    static class FeedbackData {
-        public int fid;
-        public int pid;
-        public String username;
-        public int score;
-        public String text;
-        public java.sql.Date date;
-
-        public FeedbackData(int fid, int pid, String username, int score, String text, java.sql.Date date) {
-            this.fid = fid;
-            this.pid = pid;
-            this.username = username;
-            this.score = score;
-            this.text = text;
-            this.date = date;
         }
     }
 }

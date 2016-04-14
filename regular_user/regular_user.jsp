@@ -30,7 +30,7 @@ RegularUser user = new RegularUser(username);
 		<button type="submit" class="list-group-item" formaction="record_a_visit.jsp">Record a visit</button>
 		<button type="submit" class="list-group-item" formaction="set_favorite_poi.jsp">Set a favorite POI</button>
 		<button type="submit" class="list-group-item" formaction="provide_feedback.jsp">Provide feedback for a POI</button>
-		<button class="list-group-item">Rate a feedback</button>
+		<button type="submit" class="list-group-item" formaction="rate_a_feedback.jsp">Rate a feedback</button>
 		<button class="list-group-item">Declare a user as trusted or not</button>
 		<button class="list-group-item">Search for a POI</button>
 		<button class="list-group-item">See top rated feedback</button>

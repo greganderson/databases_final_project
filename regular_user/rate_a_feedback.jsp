@@ -58,7 +58,7 @@ if (fid == null || fid == "") {
 		</table>
 		<select id="ratingOption" class="form-control">
 			<option value="0">Useless</option>
-			<option value="1">Useful</option>
+			<option value="1" selected>Useful</option>
 			<option value="2">Very Useful</option>
 		</select>
 		<button type="submit" class="btn btn-default">Rate</button>
@@ -93,10 +93,8 @@ $('#data').on('click', '.clickable-row', function(event) {
 <%
 }
 else {
-	out.println("<h1>OUTPUT PAGE</h1>");
-	out.println("<h1>" + fid + "</h1>");
-	out.println("<h1>" + rating + "</h1>");
-	//response.sendRedirect("regular_user.jsp");
+	user.rateFeedbackSql(connector.con, Integer.parseInt(fid), Integer.parseInt(rating));
+	response.sendRedirect("regular_user.jsp");
 }
 %>
 

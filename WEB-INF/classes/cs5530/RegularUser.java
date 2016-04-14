@@ -150,13 +150,14 @@ public class RegularUser extends User {
 		return true;
     }
 
-    public void rateFeedback(Connection con) {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        Map<Integer, Utils.FeedbackData> feedbackDataSet = new TreeMap<>();
+	/**
+	 * Returns feedbackDataset, usernameToFullName, and pidToPOIName as an array.
+	 */
+	public FeedbackInformation rateFeedback(Connection con) {
+        Map<Integer, FeedbackData> feedbackDataSet = new TreeMap<>();
         Map<String, String> usernameToFullName = new HashMap<>();
         Map<Integer, String> pidToPOIName = new HashMap<>();
         int i = 1;
-        String choice;
         int c;
         int feedbackRating = 0;
 
@@ -179,7 +180,7 @@ public class RegularUser extends User {
                 score = rs.getInt("score");
                 text = rs.getString("text");
                 date = rs.getDate("fbdate");
-                feedbackDataSet.put(i++, new Utils.FeedbackData(fid, pid, fb_username, score, text, date));
+                feedbackDataSet.put(i++, new FeedbackData(fid, pid, fb_username, score, text, date));
             }
 
             Statement statement = con.createStatement();
@@ -197,81 +198,18 @@ public class RegularUser extends User {
             preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Could not rate feedback");
+			return null;
         }
+		return new FeedbackInformation(feedbackDataSet, usernameToFullName, pidToPOIName);
+	}
 
-        while (true) {
-            System.out.println("Select a feedback to rate:");
-            System.out.println("(Option). User | POI | Score | Feedback | Feedback date");
-            for (Map.Entry<Integer, Utils.FeedbackData> entry : feedbackDataSet.entrySet()) {
-                Utils.FeedbackData fbd = entry.getValue();
-                String line = entry.getKey() + ". " + usernameToFullName.get(fbd.username) + " | ";
-                line += pidToPOIName.get(fbd.pid) + " | ";
-                line += fbd.score + " | " + fbd.text + " | " + fbd.date;
-                System.out.println(line);
-            }
-            System.out.println(i + ". Exit");
-
-            try {
-                while ((choice = in.readLine()) == null && choice.length() == 0) ;
-                c = Integer.parseInt(choice);
-            } catch (IOException e) {
-                continue;
-            }
-
-            if (!feedbackDataSet.containsKey(c) && c != i) {
-                System.out.println("Invalid selection");
-                continue;
-            }
-
-            break;
-        }
-
-        if (c == i)
-            return;
-
-        Utils.FeedbackData fbd = feedbackDataSet.get(c);
-        while (true) {
-            System.out.println("Selected feedback:");
-            System.out.println("User | POI | Score | Feedback | Feedback date");
-            String line = usernameToFullName.get(fbd.username) + " | ";
-            line += pidToPOIName.get(fbd.pid) + " | ";
-            line += fbd.score + " | " + fbd.text + " | " + fbd.date;
-            System.out.println(line);
-            System.out.println();
-
-            System.out.println("Rate the feedback:");
-            System.out.println("1. Very useful");
-            System.out.println("2. Useful");
-            System.out.println("3. Useless");
-
-            try {
-                while ((choice = in.readLine()) == null && choice.length() == 0) ;
-                c = Integer.parseInt(choice);
-            } catch (IOException e) {
-                continue;
-            }
-
-            if (c == 1)
-                feedbackRating = 2;
-            else if (c == 2)
-                feedbackRating = 1;
-            else if (c == 3)
-                feedbackRating = 0;
-            else
-                continue;
-            break;
-        }
-
-        rateFeedbackSql(con, fbd, feedbackRating);
-    }
-
-    private void rateFeedbackSql(Connection con, Utils.FeedbackData fbd, int feedbackRating) {
+    public void rateFeedbackSql(Connection con, int fid, int feedbackRating) {
         try {
             // Check if user already rated this feedback
             String sql = "select count(*) from Rates where username = ? and fid = ?";
             PreparedStatement preparedStatement = con.prepareStatement(sql);
             preparedStatement.setString(1, username);
-            preparedStatement.setInt(2, fbd.fid);
+            preparedStatement.setInt(2, fid);
             ResultSet rs = preparedStatement.executeQuery();
             rs.first();
             if (rs.getInt(1) > 0) {
@@ -282,7 +220,7 @@ public class RegularUser extends User {
             sql = "insert into Rates values (?, ?, ?)";
             preparedStatement = con.prepareStatement(sql);
             preparedStatement.setString(1, username);
-            preparedStatement.setInt(2, fbd.fid);
+            preparedStatement.setInt(2, fid);
             preparedStatement.setInt(3, feedbackRating);
             preparedStatement.executeUpdate();
             preparedStatement.close();

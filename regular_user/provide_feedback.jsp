@@ -69,7 +69,7 @@ else {
 	if (!success) {
 		String error = "Either you've already provided feedback for this POI or something went wrong on the server.  Click to return to home.";
 		out.println("<p>" + error + "</p>");
-		out.println("<button onclick=\"window.location.replace('regular_user.jsp')\">Return</button>");
+		out.println("<button class=\"btn btn-default\" onclick=\"window.location.replace('regular_user.jsp')\">Return</button>");
 	}
 	else
 		response.sendRedirect("regular_user.jsp");

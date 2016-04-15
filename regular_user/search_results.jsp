@@ -87,37 +87,53 @@ List<POIInformation> pois = user.searchForPOI(connector.con, searchObject);
 	<input type="hidden" id="ordering" name="ordering">
 	<input type="hidden" id="includeScore" name="includeScore">
 	<input type="hidden" id="includeTrustedParams" name="includeTrustedParams">
+	<select id="sortSelection" class="form-control">
+		<option value="0">Price: Low to High</option>
+		<option value="1">Price: High to Low</option>
+		<option value="2">Average feedback score</option>
+		<option value="3">Average trusted feedback score</option>
+	</select>
+	<button type="submit" class="btn btn-default" onclick="changeSorting();">Sort</button>
 </form>
+
+<button type="button" class="btn btn-default" onclick="window.location.replace('search_for_poi.jsp')">Return</button>
 
 </div>
 
 <script>
-function toggleSortByPrice() {
-	// TODO: Implement
-	// TODO: Figure out how to toggle asc vs desc
-	$('#ordering').val(' order by p.price_per_person asc');
-	//$('#ordering').val(' order by p.price_per_person desc');
+function changeSorting() {
+	var sort = $('#sortSelection').val();
+	if (sort == 0)
+		toggleSortByPrice(true);
+	else if (sort == 1)
+		toggleSortByPrice(false);
+	else if (sort == 2)
+		sortByAverageFeedbackScore();
+	else if (sort == 3)
+		sortByAverageTrustedFeedbackScore();
+	
+}
+function toggleSortByPrice(asc) {
+	if (asc)
+		$('#ordering').val(' order by p.price_per_person asc');
+	else
+		$('#ordering').val(' order by p.price_per_person desc');
 	$('#includeScore').val(false);
 	$('#includeTrustedParams').val(false);
 }
 
 function sortByAverageFeedbackScore() {
-	// TODO: Implement
 	$('#ordering').val(' order by score desc');
 	$('#includeScore').val(true);
 	$('#includeTrustedParams').val(false);
 }
 
 function sortByAverageTrustedFeedbackScore() {
-	// TODO: Implement
 	$('#ordering').val(' order by score desc');
 	$('#includeScore').val(true);
 	$('#includeTrustedParams').val(true);
 }
 </script>
-<%
-//response.sendRedirect("regular_user.jsp");
-%>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="../js/bootstrap.min.js"></script>

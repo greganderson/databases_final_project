@@ -32,7 +32,7 @@ RegularUser user = new RegularUser(username);
 		<button type="submit" class="list-group-item" formaction="provide_feedback.jsp">Provide feedback for a POI</button>
 		<button type="submit" class="list-group-item" formaction="rate_a_feedback.jsp">Rate a feedback</button>
 		<button type="submit" class="list-group-item" formaction="declare_user_trust.jsp">Declare a user as trusted or not</button>
-		<button class="list-group-item">Search for a POI</button>
+		<button type="submit" class="list-group-item" formaction="search_for_poi.jsp">Search for a POI</button>
 		<button class="list-group-item">See top rated feedback</button>
 		<button class="list-group-item">See cool statistics</button>
 		<button class="list-group-item">Logout</button>

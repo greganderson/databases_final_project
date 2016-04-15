@@ -269,6 +269,24 @@ public class RegularUser extends User {
         }
     }
 
+	public List<String> getListOfCategories(Connection con) {
+		List<String> categories = new ArrayList<>();
+		try {
+			String sql = "select distinct category from POI";
+			PreparedStatement preparedStatement = con.prepareStatement(sql);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                categories.add(rs.getString(1));
+            }
+            rs.close();
+			preparedStatement.close();
+		} catch (SQLException e) {
+			System.out.println("Could not get list of categories");
+		}
+		Collections.sort(categories);
+		return categories;
+	}
+
     public boolean searchForPOI(Connection con) {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String choice;
@@ -408,6 +426,150 @@ public class RegularUser extends User {
                 searchForPOIWithParams(con, sqlStart, sqlParams, sqlEnd, parameters);
             }
         }
+
+
+
+
+		/*
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        String choice;
+        int c;
+        String[] parameters = {"", "", "", "", ""};
+        int NAME = 0;
+        int PRICE_RANGE = 1;
+        int ADDRESS = 2;
+        int KEYWORDS = 3;
+        int CATEGORY = 4;
+        int NUM_PARAMS = 5;
+        Map<Integer, String> options = new TreeMap<>();
+        int i = 1;
+        options.put(i++, "Name");
+        options.put(i++, "Price range");
+        options.put(i++, "Address (City or State)");
+        options.put(i++, "Keywords");
+        options.put(i++, "Category");
+        options.put(i++, "Remove name");
+        options.put(i++, "Remove price range");
+        options.put(i++, "Remove address");
+        options.put(i++, "Remove keywords");
+        options.put(i++, "Remove category");
+        options.put(i++, "Go!");
+
+        while (true) {
+            System.out.println("Current search parameters:");
+            System.out.println("Name: " + parameters[NAME]);
+            System.out.println("Price range: " + parameters[PRICE_RANGE]);
+            System.out.println("Address (City or State): " + parameters[ADDRESS]);
+            System.out.println("Keywords: " + parameters[KEYWORDS]);
+            System.out.println("Category: " + parameters[CATEGORY]);
+            System.out.println("Change/add parameters, or get results:");
+            for (Map.Entry<Integer, String> entry : options.entrySet())
+                System.out.println(entry.getKey() + ". " + entry.getValue());
+            System.out.println(i + ". Exit");
+            try {
+                while ((choice = in.readLine()) == null && choice.length() == 0) ;
+                c = Integer.parseInt(choice);
+            } catch (IOException e) {
+                continue;
+            }
+            if (c < 1 || c > i) {
+                System.out.println("Invalid choice");
+                continue;
+            }
+
+            if (c == i)
+                return false;
+
+            if (c == NAME+1) {
+                Utils.QuestionSizePair nameQSP = new Utils.QuestionSizePair("Enter name (e.g. University of Utah): ", 50, "Invalid name");
+                parameters[NAME] = Utils.getUserInput(nameQSP, false);
+            }
+            else if (c == PRICE_RANGE+1) {
+                parameters[PRICE_RANGE] = getNewPriceRange(parameters[PRICE_RANGE]);
+            }
+            else if (c == ADDRESS+1){
+                Utils.QuestionSizePair locationQSP = new Utils.QuestionSizePair("Enter City (e.g. Beaver): " +
+                        "or State (e.g. UT or Utah): ", 80, "Invalid location");
+                parameters[ADDRESS] = Utils.getUserInput(locationQSP, false);
+            }
+            else if (c == KEYWORDS+1) {
+                TreeSet<String> keywords = getKeywords(extractKeywords(parameters[KEYWORDS]));
+                String s = "";
+                for (String word : keywords)
+                    s += word + ", ";
+                parameters[KEYWORDS] = s.substring(0, s.length()-2);
+            }
+            else if (c == CATEGORY+1) {
+                Utils.QuestionSizePair categoryQSP = new Utils.QuestionSizePair("Category (e.g. restaurant): ", 50, "Invalid input");
+                parameters[CATEGORY] = Utils.getUserInput(categoryQSP, false);
+            }
+            else if (c == NAME+NUM_PARAMS+1) {
+                parameters[NAME] = "";
+            }
+            else if (c == PRICE_RANGE+NUM_PARAMS+1) {
+                parameters[PRICE_RANGE] = "";
+            }
+            else if (c == ADDRESS+NUM_PARAMS+1) {
+                parameters[ADDRESS] = "";
+            }
+            else if (c == KEYWORDS+NUM_PARAMS+1) {
+                parameters[KEYWORDS] = "";
+            }
+            else if (c == CATEGORY+NUM_PARAMS+1) {
+                parameters[CATEGORY] = "";
+            }
+            else {
+                //String sqlStart = "select p.*, avg(f.score) as score from POI p, Feedback f where p.pid = f.pid";
+                String sqlStart = "select p.* from POI p where p.name = p.name";
+                String sqlEnd = " group by p.pid";
+                String sqlParams = "";
+
+                // Add price range
+                if (!parameters[NAME].isEmpty()) {
+                    String[] names = parameters[NAME].split(" ");
+                    for (String name : names) {
+                        sqlParams += " and p.name like '%" + name + "%'";
+                    }
+                }
+                if (!parameters[PRICE_RANGE].isEmpty()) {
+                    String lowerStr = parameters[PRICE_RANGE].substring(parameters[PRICE_RANGE].indexOf("$") + 1);
+                    int lower = Integer.parseInt(lowerStr.substring(0, lowerStr.indexOf(" ")));
+                    int higher;
+                    if (lowerStr.contains("$"))
+                        higher = Integer.parseInt(lowerStr.substring(lowerStr.indexOf("$") + 1));
+                    else
+                        higher = Integer.MAX_VALUE;
+                    sqlParams += " and p.price_per_person >= " + lower + " and p.price_per_person <= " + higher;
+                }
+
+                // Add location
+                if (!parameters[ADDRESS].isEmpty()) {
+                    String[] words = parameters[ADDRESS].split(" ");
+                    sqlParams += " and p.address like '";
+                    for (String word : words)
+                        sqlParams += "%" + word;
+                    sqlParams += "%'";
+                }
+
+                // Add keywords
+                if (!parameters[KEYWORDS].isEmpty()) {
+                    TreeSet<String> keywords = extractKeywords(parameters[KEYWORDS]);
+                    sqlParams += " and p.name in (select p1.name from Keywords k1, HasKeywords h1, POI p1" +
+                            " where k1.wid = h1.wid and h1.pid = p1.pid and (";
+                    for (String word : keywords)
+                        sqlParams += " k1.word like '%" + word + "%' or";
+                    sqlParams = sqlParams.substring(0, sqlParams.length()-3) + "))";
+                }
+
+                // Add category
+                if (!parameters[CATEGORY].isEmpty()) {
+                    sqlParams += " and p.category like '%" + parameters[CATEGORY] + "%'";
+                }
+
+                searchForPOIWithParams(con, sqlStart, sqlParams, sqlEnd, parameters);
+            }
+        }
+		*/
     }
 
     private void searchForPOIWithParams(Connection con, String sqlStart, String sqlParams, String sqlEnd, String[] params) {

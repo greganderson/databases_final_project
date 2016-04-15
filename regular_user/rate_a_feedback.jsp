@@ -44,7 +44,7 @@ if (fid == null || fid == "") {
 			</thead>
 			<tbody>
 				<%
-					FeedbackInformation result = user.rateFeedback(connector.con);
+					FeedbackInformation result = user.getFeedbackInformation(connector.con);
 					for (Map.Entry<Integer, FeedbackData> entry : result.feedbackDataSet.entrySet()) {
 						FeedbackData fbd = entry.getValue();
 						out.println("<tr id=\"" + fbd.fid + "\" class=\"clickable-row\" onmouseover=\"\" style=\"cursor: pointer;\"><td>" + result.usernameToFullName.get(fbd.username) + "</td>");

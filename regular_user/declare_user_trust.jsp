@@ -40,7 +40,7 @@ if (name == null || name == "") {
 			</thead>
 			<tbody>
 				<%
-					Set<String> result = user.declareUserTrust(connector.con);
+					List<String> result = user.getListOfUsers(connector.con);
 					for (String s : result)
 						out.println("<tr class=\"clickable-row\" onmouseover=\"\" style=\"cursor: pointer;\"><td>" + s + "</td></tr>");
 				%>

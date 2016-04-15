@@ -42,7 +42,6 @@ if( searchAttribute == null ){
 	String attributeValue = request.getParameter("attributeValue");
 	Connector connector = new Connector();
 	Order order = new Order();
-	
 %>  
 
   <p><b>Listing orders in JSP: </b><BR><BR>

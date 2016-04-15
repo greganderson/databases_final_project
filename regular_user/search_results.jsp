@@ -28,7 +28,18 @@ String state = (String)session.getAttribute("state");
 String keywords = (String)session.getAttribute("keywords");
 String category = (String)session.getAttribute("category");
 
-SearchObject searchObject = new SearchObject(name, priceRange, city + " " + state, keywords, category);
+String ordering = request.getParameter("ordering");
+String includeScoreStr = request.getParameter("includeScore");
+String includeTrustedParamsStr = request.getParameter("includeTrustedParams");
+
+boolean includeScore = false;
+boolean includeTrustedParams = false;
+if (includeScoreStr != null && includeScoreStr != "")
+	includeScore = Boolean.parseBoolean(includeScoreStr);
+if (includeTrustedParamsStr != null && includeTrustedParamsStr != "")
+	includeTrustedParams = Boolean.parseBoolean(includeTrustedParamsStr);
+
+SearchObject searchObject = new SearchObject(name, priceRange, city + " " + state, keywords, category, ordering, includeScore, includeTrustedParams);
 user.searchForPOI(connector.con, searchObject);
 
 if ((name == null || name == "") &&
@@ -43,10 +54,61 @@ if ((name == null || name == "") &&
 <div>
 <h1>Search results</h1>
 
+<div class="container">
+	<h3>POI's</h3>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Address</th>
+				<th>URL</th>
+				<th>Phone number</th>
+				<th>Price per person</th>
+				<th>Year established</th>
+				<th>Hours</th>
+				<th>Category</th>
+				<th>Average feedback score</th>
+			</tr>
+		</thead>
+		<tbody>
+			<%
+				List<POIInformation> pois = user.searchForPOI(connector.con, searchObject);
+			%>
+		</tbody>
+	</table>
+</div>
+
+<form method="post">
+	<input type="hidden" id="ordering" name="ordering">
+	<input type="hidden" id="includeScore" name="includeScore">
+	<input type="hidden" id="includeTrustedParams" name="includeTrustedParams">
+</form>
 
 </div>
 
 <script>
+function toggleSortByPrice() {
+	// TODO: Implement
+	// TODO: Figure out how to toggle asc vs desc
+	$('#ordering').val(' order by p.price_per_person asc');
+	//$('#ordering').val(' order by p.price_per_person desc');
+	$('#includeScore').val(false);
+	$('#includeTrustedParams').val(false);
+}
+
+function sortByAverageFeedbackScore() {
+	// TODO: Implement
+	$('#ordering').val(' order by score desc');
+	$('#includeScore').val(true);
+	$('#includeTrustedParams').val(false);
+}
+
+function sortByAverageTrustedFeedbackScore() {
+	// TODO: Implement
+	$('#ordering').val(' order by score desc');
+	$('#includeScore').val(true);
+	$('#includeTrustedParams').val(true);
+}
 </script>
 <%
 }

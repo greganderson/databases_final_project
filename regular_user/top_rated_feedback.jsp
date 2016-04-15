@@ -29,6 +29,7 @@ RegularUser user = new RegularUser(username);
 <form method="post">
 	<div class="form-group">
 		<div class="form-control">
+			<label for="top">Number of results to show:</label>
 			<input type="number" id="top" name="top" min="1">
 		</div>
 	</div>

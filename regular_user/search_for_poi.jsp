@@ -128,14 +128,13 @@ function search() {
 <%
 }
 else {
-	out.println("<h1>OUTPUT PAGE</h1>");
-	out.println("<h3>Name: " + name + "</h3>");
-	out.println("<h3>Name: " + priceRange + "</h3>");
-	out.println("<h3>Name: " + city + "</h3>");
-	out.println("<h3>Name: " + state + "</h3>");
-	out.println("<h3>Name: " + keywords + "</h3>");
-	out.println("<h3>Name: " + category + "</h3>");
-	//response.sendRedirect("regular_user.jsp");
+	session.setAttribute("name", name);
+	session.setAttribute("priceRange", priceRange);
+	session.setAttribute("city", city);
+	session.setAttribute("state", state);
+	session.setAttribute("keywords", keywords);
+	session.setAttribute("category", category);
+	response.sendRedirect("search_results.jsp");
 }
 %>
 

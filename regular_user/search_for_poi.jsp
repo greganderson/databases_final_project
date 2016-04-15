@@ -105,6 +105,8 @@ if ((name == null || name == "") &&
 	<button type="submit" class="btn btn-default">Search</button>
 </form>
 
+<button type="button" class="btn btn-default" onclick="window.location.replace('regular_user.jsp')">Go back</button>
+
 </div>
 
 <script>

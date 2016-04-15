@@ -229,85 +229,25 @@ public class RegularUser extends User {
         }
     }
 
-    public void declareUserTrust(Connection con) {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        Map<Integer, String> users = new TreeMap<>();
-        String choice;
-        int c;
-        int i = 1;
+    public Set<String> declareUserTrust(Connection con) {
+        Set<String> users = new TreeSet<>();
         try {
             String sql = "select name from Users where username <> ? and is_admin = false";
             PreparedStatement preparedStatement = con.prepareStatement(sql);
             preparedStatement.setString(1, username);
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
-                users.put(i++, rs.getString(1));
+                users.add(rs.getString(1));
             }
             rs.close();
             preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Could not declare user trust");
         }
-
-        System.out.println("List of Users:");
-        for (Map.Entry<Integer, String> entry : users.entrySet()) {
-            System.out.println(entry.getKey() + ". " + entry.getValue());
-        }
-        System.out.println(i + ". Exit");
-
-        while (true) {
-            try {
-                while ((choice = in.readLine()) == null && choice.length() == 0) ;
-                c = Integer.parseInt(choice);
-            } catch (IOException e) {
-                continue;
-            }
-
-            if (!users.containsKey(c) && c != i) {
-                System.out.println("Invalid selection");
-                continue;
-            }
-
-            break;
-        }
-
-        if (c == i)
-            return;
-
-        String user = users.get(c);
-
-        while (true) {
-            System.out.println("You selected: " + users.get(c));
-            System.out.println("Declare user as:");
-            System.out.println("1. Trusted");
-            System.out.println("2. Not trusted");
-            try {
-                while ((choice = in.readLine()) == null && choice.length() == 0) ;
-                c = Integer.parseInt(choice);
-            } catch (IOException e) {
-                continue;
-            }
-
-            if (c != 1 && c != 2) {
-                System.out.println("Invalid selection");
-                continue;
-            }
-
-            break;
-        }
-
-        int trustValue = 0;
-        if (c == 1) {
-            trustValue = 1;
-        }
-        else {
-            trustValue = -1;
-        }
-
-        declareUserTrustSql(con, user, trustValue);
+		return users;
     }
 
-    private void declareUserTrustSql(Connection con, String userToTrust, int trustValue) {
+    public void declareUserTrustSql(Connection con, String userToTrust, int trustValue) {
         try {
             // Remove the trust if it was there before
             String sql = "delete from Trust where username1 = ? and username2 = (select username from Users where name = ?)";

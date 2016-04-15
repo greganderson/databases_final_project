@@ -29,6 +29,8 @@ String keywords = (String)session.getAttribute("keywords");
 String category = (String)session.getAttribute("category");
 
 String ordering = request.getParameter("ordering");
+if (ordering == null)
+	ordering = "";
 String includeScoreStr = request.getParameter("includeScore");
 String includeTrustedParamsStr = request.getParameter("includeTrustedParams");
 
@@ -40,14 +42,7 @@ if (includeTrustedParamsStr != null && includeTrustedParamsStr != "")
 	includeTrustedParams = Boolean.parseBoolean(includeTrustedParamsStr);
 
 SearchObject searchObject = new SearchObject(name, priceRange, city + " " + state, keywords, category, ordering, includeScore, includeTrustedParams);
-user.searchForPOI(connector.con, searchObject);
-
-if ((name == null || name == "") &&
-	(priceRange == null || priceRange == "") &&
-	(city == null || city == "") &&
-	(state == null || state == "") &&
-	(keywords == null || keywords == "") &&
-	(category == null || category == "")) {
+List<POIInformation> pois = user.searchForPOI(connector.con, searchObject);
 %>
 
 
@@ -56,7 +51,7 @@ if ((name == null || name == "") &&
 
 <div class="container">
 	<h3>POI's</h3>
-	<table class="table">
+	<table class="table table-bordered">
 		<thead>
 			<tr>
 				<th>Name</th>
@@ -72,7 +67,17 @@ if ((name == null || name == "") &&
 		</thead>
 		<tbody>
 			<%
-				List<POIInformation> pois = user.searchForPOI(connector.con, searchObject);
+				for (POIInformation poi : pois) {
+					out.println("<tr><td>" + poi.name + "</td>");
+					out.println("<td>" + poi.address + "</td>");
+					out.println("<td>" + poi.url + "</td>");
+					out.println("<td>" + poi.phoneNumber + "</td>");
+					out.println("<td>" + poi.pricePerPerson + "</td>");
+					out.println("<td>" + poi.yearEstablished + "</td>");
+					out.println("<td>" + poi.hours + "</td>");
+					out.println("<td>" + poi.category + "</td>");
+					out.println("<td>" + poi.averageFeedbackScore + "</td></tr>");
+				}
 			%>
 		</tbody>
 	</table>
@@ -111,17 +116,7 @@ function sortByAverageTrustedFeedbackScore() {
 }
 </script>
 <%
-}
-else {
-	out.println("<h1>OUTPUT PAGE</h1>");
-	out.println("<h3>Name: " + name + "</h3>");
-	out.println("<h3>Name: " + priceRange + "</h3>");
-	out.println("<h3>Name: " + city + "</h3>");
-	out.println("<h3>Name: " + state + "</h3>");
-	out.println("<h3>Name: " + keywords + "</h3>");
-	out.println("<h3>Name: " + category + "</h3>");
-	//response.sendRedirect("regular_user.jsp");
-}
+//response.sendRedirect("regular_user.jsp");
 %>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->

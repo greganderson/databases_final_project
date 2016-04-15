@@ -288,9 +288,31 @@ public class RegularUser extends User {
 		return categories;
 	}
 
-    public boolean searchForPOI(Connection con, SearchObject searchObject) {
-		return false;
-		//searchForPOIWithParams(con, searchObject.sqlStart, searchObject.sqlParams, searchObject.sqlEnd, parameters);
+    public List<POIInformation> searchForPOI(Connection con, SearchObject searchObject) {
+		List<POIInformation> pois = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(searchObject.sql);
+            ResultSet rs = preparedStatement.executeQuery();
+			while (rs.next()) {
+				String name = rs.getString("name");
+				String address = rs.getString("address");
+				String url = rs.getString("url");
+				String phone_num = rs.getString("phone_num");
+				String price_per_person = rs.getString("price_per_person");
+				String year_of_est = rs.getString("year_of_est");
+				String hours = rs.getString("hours");
+				String category = rs.getString("category");
+				String score = "";
+				if (searchObject.includeScore)
+					score = rs.getString("score");
+				POIInformation poi = new POIInformation(name, address, url, phone_num, price_per_person, year_of_est, hours, category, score);
+				pois.add(poi);
+			}
+
+        } catch (SQLException e) {
+            System.out.println("Could not get POI's based on query parameters");
+        }
+		return pois;
 
 
 
@@ -437,7 +459,8 @@ public class RegularUser extends User {
 		*/
     }
 
-    private void searchForPOIWithParams(Connection con, String sqlStart, String sqlParams, String sqlEnd, String[] params) {
+    private void searchForPOIWithParams(Connection con, String sql, boolean includeScore) {
+		/*
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String choice;
         int c;
@@ -529,6 +552,7 @@ public class RegularUser extends User {
         } catch (SQLException e) {
             System.out.println("Could not get POI's based on query parameters");
         }
+		*/
     }
 
     private String getNewPriceRange(String original) {

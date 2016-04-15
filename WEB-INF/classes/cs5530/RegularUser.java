@@ -315,10 +315,8 @@ public class RegularUser extends User {
 		return pois;
     }
 
-    public void findTopNMostUsefulFeedbacks(Connection con) {
-        Utils.QuestionSizePair topQSP = new Utils.QuestionSizePair("How many top feedbacks to view (e.g. 5): ", 10, "Invalid number");
-        int top = Integer.parseInt(Utils.getUserInput(topQSP, true));
-
+    public List<TopFeedbackInformation> findTopNMostUsefulFeedbacks(Connection con, int top) {
+		List<TopFeedbackInformation> result = new ArrayList<>();
         try {
             String sql = "select u.name as username," +
                     " p.name as poi_name," +
@@ -331,19 +329,21 @@ public class RegularUser extends User {
             PreparedStatement preparedStatement = con.prepareStatement(sql);
             preparedStatement.setInt(1, top);
             ResultSet rs = preparedStatement.executeQuery();
-            System.out.println("Top " + top + " most useful feedbacks:");
-            System.out.println("User | POI name | Feedback score | Text | Feedback date | Average usefulness rating");
             while (rs.next()) {
-                String result = rs.getString("username") + " | " + rs.getString("poi_name") + " | ";
-                result += rs.getString("score") + " | " + rs.getString("text") + " | ";
-                result += rs.getString("fbdate") + " | " + rs.getString("avg_rating");
-                System.out.println(result);
+				String username = rs.getString("username");
+				String poiName = rs.getString("poi_name");
+				String score = rs.getString("score");
+				String text = rs.getString("text");
+				String fbdate = rs.getString("fbdate");
+				String avgRating = rs.getString("avg_rating");
+				result.add(new TopFeedbackInformation(username, poiName, score, text, fbdate, avgRating));
             }
             rs.close();
             preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Could not get top n feedbacks");
         }
+		return result;
     }
 
     public void getCoolStatistics(Connection con) {

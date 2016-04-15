@@ -35,7 +35,7 @@ RegularUser user = new RegularUser(username);
 		<button type="submit" class="list-group-item" formaction="search_for_poi.jsp">Search for a POI</button>
 		<button type="submit" class="list-group-item" formaction="top_rated_feedback.jsp">See top rated feedback</button>
 		<button type="submit" class="list-group-item" formaction="cool_statistics.jsp">See cool statistics</button>
-		<button class="list-group-item">Logout</button>
+		<button type="button" class="list-group-item" onclick="window.location.replace('../index.jsp')">Logout</button>
 	</div>
 </form>
 

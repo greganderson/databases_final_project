@@ -33,8 +33,8 @@ RegularUser user = new RegularUser(username);
 		<button type="submit" class="list-group-item" formaction="rate_a_feedback.jsp">Rate a feedback</button>
 		<button type="submit" class="list-group-item" formaction="declare_user_trust.jsp">Declare a user as trusted or not</button>
 		<button type="submit" class="list-group-item" formaction="search_for_poi.jsp">Search for a POI</button>
-		<button class="list-group-item">See top rated feedback</button>
-		<button class="list-group-item">See cool statistics</button>
+		<button type="submit" class="list-group-item" formaction="top_rated_feedback.jsp">See top rated feedback</button>
+		<button type="submit" class="list-group-item" formaction="cool_statistics.jsp">See cool statistics</button>
 		<button class="list-group-item">Logout</button>
 	</div>
 </form>

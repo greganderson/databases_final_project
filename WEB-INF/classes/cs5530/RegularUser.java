@@ -346,79 +346,24 @@ public class RegularUser extends User {
 		return result;
     }
 
-    public void getCoolStatistics(Connection con) {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String choice;
-        int c;
-        Map<Integer, String> options = new TreeMap<>();
-        int i = 1;
-        options.put(i++, "Top most popular POI's per category");
-        options.put(i++, "Most expensive POI's per category");
-        options.put(i++, "Top rated POI's per category");
-
-        while (true) {
-            System.out.println("Cool statistics:");
-            for (Map.Entry<Integer, String> entry : options.entrySet())
-                System.out.println(entry.getKey() + ". " + entry.getValue());
-            System.out.println(i + ". Go back");
-
-            try {
-                while ((choice = in.readLine()) == null && choice.length() == 0) ;
-                c = Integer.parseInt(choice);
-            } catch (IOException e) {
-                continue;
-            }
-            if (c < 1 || c > i) {
-                System.out.println("Invalid choice");
-                continue;
-            }
-            break;
-        }
-
-        Utils.QuestionSizePair nQSP = new Utils.QuestionSizePair("How many results per category do you want to see: ", 10, "Invalid number");
-        int n = Integer.parseInt(Utils.getUserInput(nQSP, true));
-
-        if (c == 1) {
-            String sql = "select p.name, count(*) from Visit v, POI p where v.pid = p.pid and p.category = ? group by v.pid order by count(*) desc limit " + n;
-            String resultSchema = "POI Name | Total number of visits";
-            getTopNStatPOIs(con, sql, resultSchema);
-        }
-        else if (c == 2) {
-            String sql = "select p.name, avg(e.cost) from Visit v, POI p, VisitEvent e" +
-                    " where v.pid = p.pid and v.vid = e.vid and p.category = ?" +
-                    " group by v.pid order by avg(e.cost) desc limit " + n;
-            String resultSchema = "POI name | Price per person";
-            getTopNStatPOIs(con, sql, resultSchema);
-        }
-        else if (c == 3) {
-            String sql = "select p.name, avg(f.score) from Feedback f, POI p" +
-                    " where f.pid = p.pid and p.category = ? group by p.pid order by avg(f.score) desc limit " + n;
-            String resultSchema = "POI name | Average feedback score";
-            getTopNStatPOIs(con, sql, resultSchema);
-        }
-    }
-
-    private void getTopNStatPOIs(Connection con, String sql, String resultSchema) {
-        Set<String> categories = getCategories(con);
+    public List<String[]> getTopNStatPOIs(Connection con, String sql, String category) {
+		List<String[]> result = new ArrayList<>();
         try {
-            PreparedStatement preparedStatement;
-            ResultSet rs;
-            System.out.println(resultSchema);
-            for (String category : categories) {
-                preparedStatement = con.prepareStatement(sql);
-                preparedStatement.setString(1, category);
-                rs = preparedStatement.executeQuery();
-                System.out.println("Category: " + category);
-                while (rs.next())
-                    System.out.println(rs.getString(1) + " | " + rs.getInt(2));
-            }
+			PreparedStatement preparedStatement = con.prepareStatement(sql);
+			preparedStatement.setString(1, category);
+			ResultSet rs = preparedStatement.executeQuery();
+			while (rs.next()) {
+				String[] arr = {rs.getString(1), rs.getInt(2) + ""};
+				result.add(arr);
+			}
         } catch (SQLException e) {
             System.out.println("Could not get top n results");
         }
+		return result;
     }
 
-    private Set<String> getCategories(Connection con) {
-        Set<String> categories = new HashSet<>();
+    public List<String> getCategories(Connection con) {
+        List<String> categories = new ArrayList<>();
         try {
             String sql = "select distinct category from POI";
             PreparedStatement preparedStatement = con.prepareStatement(sql);

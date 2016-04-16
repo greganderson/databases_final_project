@@ -99,9 +99,8 @@ if(username == null || username == ""){
 		user = new Admin(username);
 		boolean success = user.login(username, password, true, connector.con);
 		if (success) {
-			%>
-			<script>alert('TODO: Redirect to admin page');</script>
-			<%
+			session.setAttribute("username", username);
+			response.sendRedirect("admin/admin.jsp");
 		}
 		else {
 			%>

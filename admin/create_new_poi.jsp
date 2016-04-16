@@ -1,4 +1,4 @@
-<%@ page language="java" import="cs5530.*,java.util.TreeSet,java.sql.*" %>
+<%@ page language="java" import="cs5530.*,java.util.*,java.sql.*" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="en">
 <head>
@@ -21,14 +21,14 @@ Connector connector = new Connector();
 String username = (String)session.getAttribute("username");
 Admin user = new Admin(username);
 
-String costPerPerson = request.getParameter("costPerPersonSave");
-if (costPerPerson == null || costPerPerson == "") {
+String poiName = request.getParameter("poiName");
+if (poiName == null || poiName == "") {
 %>
 
 <div>
 <h1>Create New POI:</h1>
 
-<form method="post">
+<form method="post" onsubmit="saveKeywords();">
 	<div class="form-group">
 		<label for="poiName">Name:</label>
 		<input class="form-control" type="text" max="50" id="poiName" name="poiName" placeholder="The Pizza Place" required>
@@ -37,7 +37,7 @@ if (costPerPerson == null || costPerPerson == "") {
 		<input class="form-control" type="text" max="80" id="address" name="address" placeholder="123 S. 456 E. Beaver, UT 12345" required>
 
 		<label for="url">URL:</label>
-		<input class="form-control" type="url" max="50" id="url" name="url" placeholder="www.mywebsitegoeshere.com" required>
+		<input class="form-control" type="text" max="50" id="url" name="url" placeholder="www.mywebsitegoeshere.com" required>
 
 		<label for="phone_num">Phone Number:</label>
 		<input class="form-control" type='text' id="phone_num" name="phone_num" pattern='[\(]\d{3}[\)][\-]\d{3}[\-]\d{4}' title='Phone Number (Format: (123)-456-7890)' placeholder="(123)-456-7890" required>
@@ -59,11 +59,17 @@ if (costPerPerson == null || costPerPerson == "") {
 		<label for="category">Category:</label>
 		<input class="form-control" type="text" max="50" id="category" name="category" placeholder="restaurant" required>
 
-
-
-		<label for="fullname">Full name:</label>
-		<input class="form-control" type="text" max="40" id="fullname" name="fullname" placeholder="John Psmythe" required>
+		<div class="input-group">
+			<input type="text" id="keyword" class="form-control" placeholder="keyword">
+			<span class="input-group-btn">
+				<button type="button" class="btn btn-default" onclick="addKeyword()">Add</button>
+			</span>
+		</div>
+		<ul id="keywords" class="list-group">
+		</ul>
 	</div>
+
+	<input type="hidden" id="keywordList" name="keywordList">
 	<button type="submit" class="btn btn-default">Submit</button>
 </form>
 
@@ -71,11 +77,54 @@ if (costPerPerson == null || costPerPerson == "") {
 
 </div>
 
+<script>
+function addKeyword() {
+	var exists = false;
+	$('#keywords').find('li').each(function () {
+		if (this.innerText == $('#keyword').val())
+			exists = true;
+	});
+	// If keyword already exists, don't add it
+	if (!exists)
+		$('#keywords').append('<li class="list-group-item">' + $('#keyword').val() + '</li>');
+	$('#keyword').val('');
+	$('#keyword').focus();
+}
+
+function saveKeywords() {
+	var keywords = '';
+	$('#keywords').find('li').each(function () {
+		keywords += this.innerText + ' ';
+	});
+	$('#keywordList').val(keywords);
+}
+</script>
+
 <%
 }
 else {
-	out.println("<h1>OUTPUT PAGE</h1>");
-	//response.sendRedirect("regular_user.jsp");
+	// Create POI
+	String address = request.getParameter("address");
+	String url = request.getParameter("url");
+	String phone_num = request.getParameter("phone_num");
+	phone_num = phone_num.replaceAll("[\\(\\)-]", "");
+	String costPerPerson = request.getParameter("costPerPerson");
+	String yearEstablished = request.getParameter("yearEstablished");
+	String hours = request.getParameter("hours");
+	String category = request.getParameter("category");
+	int pid = user.addPOISql(connector.con, poiName, address, url, phone_num, costPerPerson, yearEstablished, hours, category);
+
+	// Add keywords
+	String[] keywordList = request.getParameter("keywordList").split(" ");
+	Set<String> keywords = new HashSet<>();
+	for (String keyword : keywordList) {
+		if (keyword.isEmpty())
+			continue;
+		keywords.add(keyword);
+	}
+	user.addKeywords(connector.con, keywords, pid);
+
+	response.sendRedirect("admin.jsp");
 }
 %>
 

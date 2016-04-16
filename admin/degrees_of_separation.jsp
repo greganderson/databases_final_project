@@ -21,16 +21,18 @@ Connector connector = new Connector();
 String username = (String)session.getAttribute("username");
 Admin user = new Admin(username);
 
-if (true) {
+String user1 = request.getParameter("user1");
+String user2 = request.getParameter("user2");
+if (user1 == null || user1 == "") {
 %>
 
 <div>
 <h1>Select Two Users:</h1>
 
-<h3>POI</h3>
-<form role="form" method="post">
+<form role="form" method="post" onsubmit="return check()">
 	<div class="row">
 		<div class="col-md-6">
+			<label for="notSelected">Not Selected</label>
 			<ul id="notSelected" class="list-group">
 				<%
 				Set<String> users = user.getListOfUsers(connector.con);
@@ -42,10 +44,13 @@ if (true) {
 			</ul>
 		</div>
 		<div class="col-md-6">
+			<label for="selected">Selected</label>
 			<ul id="selected" class="list-group">
 			</ul>
 		</div>
 	</div>
+	<input type="hidden" id="user1" name="user1">
+	<input type="hidden" id="user2" name="user2">
 	<button type="submit" class="btn btn-default">Submit</button>
 </form>
 
@@ -54,6 +59,17 @@ if (true) {
 </div>
 
 <script>
+function check() {
+	var selectedUsers = $('#selected li').get();
+	if (selectedUsers.length != 2) {
+		alert('Please select 2 users');
+		return false;
+	}
+	$('#user1').val(selectedUsers[0].innerText);
+	$('#user2').val(selectedUsers[1].innerText);
+	return true;
+}
+
 function addUser(item) {
 	$('#selected').append('<li class="list-group-item">' + item.innerText + '<%=selectedSpan%></li>');
 	var items = $('#selected li').get();
@@ -89,7 +105,10 @@ function comparator(a, b) {
 <%
 }
 else {
-	out.println("<h1>OUTPUT PAGE</h1>");
+	out.println("<h1>Degrees of Separation</h1>");
+	String separation = user.getDegreesOfSeparation(connector.con, user1, user2);
+	out.println("<h3>" + separation + "</h3>");
+	out.println("<button type=\"button\" class=\"btn btn-default\" onclick=\"window.location.replace('admin.jsp')\">Go back</button>");
 }
 %>
 

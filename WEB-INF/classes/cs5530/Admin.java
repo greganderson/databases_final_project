@@ -202,86 +202,35 @@ public class Admin extends User {
 		return result;
     }
 
-    public void getDegreesOfSeparation(Connection con) {
-        // Get two users
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String choice;
-        int c;
-        Map<Integer, String> users = new TreeMap<>();
-        int i = 1;
+	public Set<String> getListOfUsers(Connection con) {
+        Set<String> users = new TreeSet<>();
         try {
             String sql = "select username from Users where is_admin = false";
             PreparedStatement preparedStatement = con.prepareStatement(sql);
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next())
-                users.put(i++, rs.getString(1));
+                users.add(rs.getString(1));
             rs.close();
             preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Could not get degrees of separation");
         }
+		return users;
+	}
 
-        while (true) {
-            System.out.println("Select the first user:");
-            for (Map.Entry<Integer, String> entry : users.entrySet())
-                System.out.println(entry.getKey() + ". " + entry.getValue());
-            System.out.println(i + ". Go back");
-
-            try {
-                while ((choice = in.readLine()) == null && choice.length() == 0) ;
-                c = Integer.parseInt(choice);
-            } catch (IOException e) {
-                continue;
-            }
-            if (c < 1 || c > i) {
-                System.out.println("Invalid choice");
-                continue;
-            }
-            break;
-        }
-
-        if (c == i)
-            return;
-
-        String user1 = users.get(c);
-        users.remove(c);
-
-        while (true) {
-            System.out.println("Select the second user:");
-            for (Map.Entry<Integer, String> entry : users.entrySet())
-                System.out.println(entry.getKey() + ". " + entry.getValue());
-            System.out.println(i + ". Go back");
-
-            try {
-                while ((choice = in.readLine()) == null && choice.length() == 0) ;
-                c = Integer.parseInt(choice);
-            } catch (IOException e) {
-                continue;
-            }
-            if (c < 1 || c > i) {
-                System.out.println("Invalid choice");
-                continue;
-            }
-            break;
-        }
-
-        String user2 = users.get(c);
+    public String getDegreesOfSeparation(Connection con, String user1, String user2) {
         Set<String> user1FirstDegreers = getFirstDegreeUsers(con, user1);
-        if (user1FirstDegreers.contains(user2)) {
-            System.out.println(user1 + " and " + user2 + " are 1-degree away");
-            return;
-        }
+		String result = "";
+        if (user1FirstDegreers.contains(user2))
+            return user1 + " and " + user2 + " are 1-degree away";
 
         Set<String> user2FirstDegreers = getFirstDegreeUsers(con, user2);
 
-        for (String u : user1FirstDegreers) {
-            if (user2FirstDegreers.contains(u)) {
-                System.out.println(user1 + " and " + user2 + " are 2-degrees away");
-                return;
-            }
-        }
+        for (String u : user1FirstDegreers)
+            if (user2FirstDegreers.contains(u))
+                return user1 + " and " + user2 + " are 2-degrees away";
 
-        System.out.println(user1 + " and " + user2 + " are more than 2-degrees away");
+        return user1 + " and " + user2 + " are more than 2-degrees away";
     }
 
     private Set<String> getFirstDegreeUsers(Connection con, String user) {

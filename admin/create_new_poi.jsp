@@ -66,6 +66,7 @@ if (poiName == null || poiName == "") {
 			</span>
 		</div>
 		<ul id="keywords" class="list-group">
+			<li class="list-group-item">Test 1<span onmouseover="" onclick="this.parentElement.remove()" style="font-size: 16px; cursor: pointer;" class="pull-right hidden-xs showopacity glyphicon glyphicon-minus"></span></li>
 		</ul>
 	</div>
 
@@ -85,8 +86,9 @@ function addKeyword() {
 			exists = true;
 	});
 	// If keyword already exists, don't add it
+	var span = '<span onmouseover="" onclick="this.parentElement.remove()" style="font-size: 16px; cursor: pointer;" class="pull-right hidden-xs showopacity glyphicon glyphicon-minus"></span>';
 	if (!exists)
-		$('#keywords').append('<li class="list-group-item">' + $('#keyword').val() + '</li>');
+		$('#keywords').append('<li class="list-group-item">' + $('#keyword').val() + span + '</li>');
 	$('#keyword').val('');
 	$('#keyword').focus();
 }

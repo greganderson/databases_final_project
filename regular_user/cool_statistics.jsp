@@ -26,7 +26,7 @@ RegularUser user = new RegularUser(username);
 <div>
 <h1>Cool Statistics:</h1>
 
-<form method="post" onsubmit="return setStatSelection()">
+<form method="post">
 	<div class="form-group">
 		<div class="form-control">
 			<label for="topResults">Number of results to show:</label>
@@ -100,12 +100,6 @@ if (statSelectionStr != null && statSelectionStr != "") {
 <button type="button" class="btn btn-default" onclick="window.location.replace('regular_user.jsp')">Go back</button>
 
 </div>
-
-<script>
-function setStatSelection() {
-	return true;
-}
-</script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="../js/bootstrap.min.js"></script>

@@ -21,25 +21,7 @@ public class RegularUser extends User {
         this.username = username;
     }
 
-    public static boolean createNewUser(Connection con) {
-        Utils.QuestionSizePair usernameQSP = new Utils.QuestionSizePair("Username: ", 30);
-        Utils.QuestionSizePair passwordQSP = new Utils.QuestionSizePair("Password: ", 30);
-        Utils.QuestionSizePair fullnameQSP = new Utils.QuestionSizePair("Full name (e.g. John Psmythe): ", 40);
-        Utils.QuestionSizePair addressQSP = new Utils.QuestionSizePair("Address (e.g. 123 S. 456 E. Beaver, UT 12345): ", 80);
-        Utils.QuestionSizePair phone_numQSP = new Utils.QuestionSizePair("Phone number (e.g. 1234567890): ", 10, "Invalid phone number");
-
-        String username = Utils.getUserInput(usernameQSP, false);
-        String password = Utils.getUserInput(passwordQSP, false);
-        String fullname = Utils.getUserInput(fullnameQSP, false);
-        String address = Utils.getUserInput(addressQSP, false);
-        String phone_num;
-        while (true) {
-            phone_num = Utils.getUserInput(phone_numQSP, true);
-            if (phone_num.length() == 10)
-                break;
-            System.out.println(phone_numQSP.errorMessage);
-        }
-
+    public static boolean createNewUser(Connection con, String username, String password, String fullname, String address, String phone_num) {
         String sql = "insert into Users values (?, ?, false, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = con.prepareStatement(sql);

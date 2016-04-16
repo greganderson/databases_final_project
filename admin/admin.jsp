@@ -31,7 +31,7 @@ Admin user = new Admin(username);
 		<button type="submit" class="list-group-item" formaction="poi_update_selection.jsp">Update existing POI</button>
 		<button type="submit" class="list-group-item" formaction="top_trusted_users.jsp">Top most trusted users</button>
 		<button type="submit" class="list-group-item" formaction="top_useful_users.jsp">Top most useful users</button>
-		<button class="list-group-item">Get degrees of separation between two users</button>
+		<button type="submit" class="list-group-item" formaction="degrees_of_separation.jsp">Get degrees of separation between two users</button>
 		<button type="button" class="list-group-item" onclick="window.location.replace('../index.jsp')">Logout</button>
 	</div>
 </form>

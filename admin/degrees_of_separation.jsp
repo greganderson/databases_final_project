@@ -46,6 +46,7 @@ if (true) {
 			</ul>
 		</div>
 	</div>
+	<button type="submit" class="btn btn-default">Submit</button>
 </form>
 
 <button type="button" class="btn btn-default" onclick="window.location.replace('admin.jsp')">Go back</button>
@@ -55,12 +56,33 @@ if (true) {
 <script>
 function addUser(item) {
 	$('#selected').append('<li class="list-group-item">' + item.innerText + '<%=selectedSpan%></li>');
+	var items = $('#selected li').get();
+	items.sort(comparator);
+	$.each(items, function(i, li) {
+		$('#selected').append(li);
+	});
 	item.remove();
 }
 
 function removeUser(item) {
 	$('#notSelected').append('<li class="list-group-item">' + item.innerText + '<%=notSelectedSpan%></li>');
+	var items = $('#notSelected li').get();
+	items.sort(comparator);
+	$.each(items, function(i, li) {
+		$('#notSelected').append(li);
+	});
 	item.remove();
+}
+
+function comparator(a, b) {
+	var keyA = $(a).text();
+	var keyB = $(b).text();
+
+	if (keyA < keyB)
+		return -1;
+	if (keyA > keyB)
+		return 1;
+	return 0;
 }
 </script>
 

@@ -17,26 +17,40 @@
 <body>
 
 <%
+Connector connector = new Connector();
 String username = (String)session.getAttribute("username");
 Admin user = new Admin(username);
+
+String poiName = request.getParameter("poiName");
+if (poiName == null || poiName == "") {
 %>
 
+<div>
+<h1>Select POI to Update:</h1>
 
-<div id="regular_user_content">
-<h1>Welcome <%=username%>!</h1>
-
-<form for="form" method="post">
+<h3>POI</h3>
+<form role="form" method="post">
 	<div class="list-group">
-		<button type="submit" class="list-group-item" formaction="create_new_poi.jsp">Create new POI</button>
-		<button type="submit" class="list-group-item" formaction="poi_update_selection.jsp">Update existing POI</button>
-		<button class="list-group-item">Top most trusted users</button>
-		<button class="list-group-item">Top most useful users</button>
-		<button class="list-group-item">Get degrees of separation between two users</button>
-		<button type="button" class="list-group-item" onclick="window.location.replace('../index.jsp')">Logout</button>
+	<%
+	TreeSet<String> pois = user.getUserInputPOIName(connector.con);
+	String start = "<button type=\"text\" class=\"list-group-item\" onclick=\"clicked(this)\" name=\"poiName\" value=\"";
+	for (String poi : pois)
+		out.println(start + poi + "\">" + poi + "</button>");
+	%>
 	</div>
 </form>
 
+<button type="button" class="btn btn-default" onclick="window.location.replace('admin.jsp')">Go back</button>
+
 </div>
+
+<%
+}
+else {
+	session.setAttribute("poiName", poiName);
+	response.sendRedirect("update_poi.jsp");
+}
+%>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="../js/bootstrap.min.js"></script>

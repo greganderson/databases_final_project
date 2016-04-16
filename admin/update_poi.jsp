@@ -1,4 +1,4 @@
-<%@ page language="java" import="cs5530.*,java.util.TreeSet,java.sql.*" %>
+<%@ page language="java" import="cs5530.*,java.util.*,java.sql.*" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="en">
 <head>
@@ -19,38 +19,16 @@
 <%
 Connector connector = new Connector();
 String username = (String)session.getAttribute("username");
+String poiName = (String)session.getAttribute("poiName");
 Admin user = new Admin(username);
 
-String poiName = request.getParameter("poiName");
-if (poiName == null || poiName == "") {
-%>
-
-<div>
-<h1>Select POI to Update:</h1>
-
-<h3>POI</h3>
-<form role="form" method="post">
-	<div class="list-group">
-	<%
-	TreeSet<String> pois = user.getUserInputPOIName(connector.con);
-	String start = "<button type=\"text\" class=\"list-group-item\" onclick=\"clicked(this)\" name=\"poiName\" value=\"";
-	for (String poi : pois)
-		out.println(start + poi + "\">" + poi + "</button>");
-	%>
-	</div>
-</form>
-
-<button type="button" class="btn btn-default" onclick="window.location.replace('admin.jsp')">Go back</button>
-
-</div>
-
-<%
-}
-else {
+String update = request.getParameter("update");
+if (update == null || update == "") {
 	POIInformation poi = user.updatePOI(connector.con, poiName);
+	session.setAttribute("pid", poi.pid);
 %>
 <h1>Update POI:</h1>
-<form method="post" onsubmit="saveKeywords();">
+<form method="post" onsubmit="saveKeywords(); $('#update').val('update');">
 	<div class="form-group">
 		<label for="poiName">Name:</label>
 		<input class="form-control" type="text" max="50" id="poiName" name="poiName" placeholder="The Pizza Place" value="<%=poi.name%>" required>
@@ -100,6 +78,7 @@ else {
 	</div>
 
 	<input type="hidden" id="keywordList" name="keywordList">
+	<input type="hidden" id="update" name="update">
 	<button type="submit" class="btn btn-default">Update</button>
 </form>
 
@@ -131,6 +110,32 @@ function saveKeywords() {
 }
 </script>
 <%
+}
+else {
+	String address = request.getParameter("address");
+	String url = request.getParameter("url");
+	String phone_num = request.getParameter("phone_num");
+	phone_num = phone_num.replaceAll("[\\(\\)-]", "");
+	String costPerPerson = request.getParameter("costPerPerson");
+	String yearEstablished = request.getParameter("yearEstablished");
+	String hours = request.getParameter("hours");
+	String category = request.getParameter("category");
+	int pid = (int)session.getAttribute("pid");
+	POIInformation poi = new POIInformation(poiName, address, url, phone_num, costPerPerson, yearEstablished, hours, category, "");
+	poi.setPid(pid);
+	user.updatePOIFields(connector.con, poi);
+
+	// Add keywords
+	String[] keywordList = request.getParameter("keywordList").split(" ");
+	Set<String> keywords = new HashSet<>();
+	for (String keyword : keywordList) {
+		if (keyword.isEmpty())
+			continue;
+		keywords.add(keyword);
+	}
+	user.updateKeywords(connector.con, keywords, pid);
+
+	response.sendRedirect("admin.jsp");
 }
 %>
 

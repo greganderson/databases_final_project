@@ -12,49 +12,12 @@ import java.util.*;
 public class Admin extends User {
 
 	private String username;
-    private Utils.QuestionSizePair nameQSP;
-    private Utils.QuestionSizePair addressQSP;
-    private Utils.QuestionSizePair urlQSP;
-    private Utils.QuestionSizePair phone_numQSP;
-    private Utils.QuestionSizePair price_per_personQSP;
-    private Utils.QuestionSizePair year_of_estQSP;
-    private Utils.QuestionSizePair hoursQSP;
-    private Utils.QuestionSizePair categoryQSP;
 
     public Admin(String username) {
 		this.username = username;
-        nameQSP = new Utils.QuestionSizePair("Name (e.g. Pizza Place): ", 50);
-        addressQSP = new Utils.QuestionSizePair("Address (e.g. 123 S. 456 E. Beaver, UT 12345): ", 80);
-        urlQSP = new Utils.QuestionSizePair("URL (e.g. www.mywebsitegoeshere.com): ", 50);
-        phone_numQSP = new Utils.QuestionSizePair("Phone number (e.g. 1234567890): ", 10, "Invalid phone number");
-        price_per_personQSP = new Utils.QuestionSizePair("Price per person (e.g. $12): ", 1000, "Invalid price");
-        year_of_estQSP = new Utils.QuestionSizePair("Year of establishment (e.g. 1970): ", 4, "Invalid year");
-        hoursQSP = new Utils.QuestionSizePair("Hours (e.g. 7:00am-9:00pm): ", 22);
-        categoryQSP = new Utils.QuestionSizePair("Category (e.g. restaurant): ", 50);
     }
 
-    public void addPOI(Connection con) {
-        String name = Utils.getUserInput(nameQSP, false);
-        String address = Utils.getUserInput(addressQSP, false);
-        String url = Utils.getUserInput(urlQSP, false);
-        String phone_num;
-        while (true) {
-            phone_num = Utils.getUserInput(phone_numQSP, true);
-            if (phone_num.length() == 10)
-                break;
-            System.out.println(phone_numQSP.errorMessage);
-        }
-        String price_per_person = Utils.getDollarAmount(price_per_personQSP);
-        String year_of_est = Utils.getUserInput(year_of_estQSP, true);
-        // TODO: Probably needs some error checking here :(
-        String hours = Utils.getUserInput(hoursQSP, false);
-        String category = Utils.getUserInput(categoryQSP, false);
-        TreeSet<String> keywords = getKeywords();
-
-        addPOISql(con, name, address, url, phone_num, price_per_person, year_of_est, hours, category, keywords);
-    }
-
-    private void addPOISql(Connection con,
+    public int addPOISql(Connection con,
                            String name,
                            String address,
                            String url,
@@ -62,8 +25,7 @@ public class Admin extends User {
                            String price_per_person,
                            String year_of_est,
                            String hours,
-                           String category,
-                           Set<String> keywords) {
+                           String category) {
         // Add POI
         String sql = "INSERT INTO POI (name, address, url, phone_num, price_per_person, year_of_est, hours, category)" +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -94,159 +56,69 @@ public class Admin extends User {
         } catch (SQLException e) {
             System.out.println("Could not execute getting pid from POI");
         }
-        addKeywords(con, keywords, pid);
+		return pid;
     }
 
-    public void updatePOI(Connection con) {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String choice;
-        int c;
+    public POIInformation updatePOI(Connection con, String poiName) {
+		POIInformation poi = null;
+		try {
+			Statement statement = con.createStatement();
+			ResultSet rs = statement.executeQuery("select * from POI where name = '" + poiName + "'");
+			rs.first();
+			int pid = rs.getInt("pid");
+			String address = rs.getString("address");
+			String url = rs.getString("url");
+			String phone_num = rs.getString("phone_num");
+			String price_per_person = rs.getString("price_per_person");
+			String year_of_est = rs.getString("year_of_est");
+			String hours = rs.getString("hours");
+			String category = rs.getString("category");
 
-        int pid = -1;
-        String name = getUserInputPOIName(con, "Please select a POI to update:");
-        if (name.isEmpty())
-            return;
-        String address = "";
-        String url = "";
-        String phone_num = "";
-        String price_per_person = "";
-        String year_of_est = "";
-        String hours = "";
-        String category = "";
-        TreeSet<String> words = new TreeSet<>();
+			// Get keywords
+			rs = statement.executeQuery("select k.word from Keywords k, HasKeywords h " +
+					"where k.wid = h.wid and h.pid = " + pid);
+			Set<String> words = new HashSet<>();
+			while (rs.next())
+				words.add(rs.getString(1));
 
-        // Get specific part of POI to update
-        while (true) {
-            System.out.println("Current fields:");
-            String[] keywords = new String[0];
-            try {
-                Statement statement = con.createStatement();
-                ResultSet rs = statement.executeQuery("select * from POI where name = '" + name + "'");
-                rs.first();
-                pid = rs.getInt("pid");
-                address = rs.getString("address");
-                url = rs.getString("url");
-                phone_num = rs.getString("phone_num");
-                price_per_person = rs.getString("price_per_person");
-                year_of_est = rs.getString("year_of_est");
-                hours = rs.getString("hours");
-                category = rs.getString("category");
+			poi = new POIInformation(poiName, address, url, phone_num, price_per_person, year_of_est, hours, category, "");
+			poi.setPid(pid);
+			poi.setKeywords(words);
 
-                // Get keywords
-                rs = statement.executeQuery("select k.word from Keywords k, HasKeywords h " +
-                        "where k.wid = h.wid and h.pid = " + pid);
-                while (rs.next()) {
-                    words.add(rs.getString(1));
-                }
-                keywords = words.toArray(new String[words.size()]);
+			statement.close();
+			rs.close();
+		} catch (SQLException e) {
+			System.out.println("Could not execute getting list of fields for POI");
+		}
 
-                statement.close();
-                rs.close();
-            } catch (SQLException e) {
-                System.out.println("Could not execute getting list of fields for POI");
-            }
-            System.out.println("Name: " + name);
-            System.out.println("Address: " + address);
-            System.out.println("URL: " + url);
-            System.out.println("Phone number: " + phone_num);
-            System.out.println("Price per person: $" + price_per_person);
-            System.out.println("Year of establishment: " + year_of_est);
-            System.out.println("Hours: " + hours);
-            System.out.println("Category: " + category);
-            System.out.print("Keywords: ");
-            if (keywords.length != 0) {
-                System.out.print(keywords[0]);
-                if (keywords.length > 1) {
-                    System.out.print(", ");
-                    for (int j = 1; j < keywords.length - 1; j++) {
-                        System.out.print(keywords[j] + ", ");
-                    }
-                    System.out.print(keywords[keywords.length - 1]);
-                }
-                System.out.println();
-            }
-            System.out.println();
-
-            System.out.println("Please select a field to update:");
-            System.out.println("1. Name");
-            System.out.println("2. Address");
-            System.out.println("3. URL");
-            System.out.println("4. Phone number");
-            System.out.println("5. Price per person");
-            System.out.println("6. Year of establishment");
-            System.out.println("7. Hours");
-            System.out.println("8. Category");
-            System.out.println("9. Keywords");
-            System.out.println("10. Exit");
-
-            try {
-                while ((choice = in.readLine()) == null && choice.length() == 0) ;
-                c = Integer.parseInt(choice);
-            } catch (IOException e) {
-                continue;
-            }
-
-            String field = "";
-            String newValue = "";
-
-            if (c == 1) {
-                field = "name";
-                newValue = Utils.getUserInput(nameQSP, false);
-            }
-            else if (c == 2) {
-                field = "address";
-                newValue = Utils.getUserInput(addressQSP, false);
-            }
-            else if (c == 3) {
-                field = "url";
-                newValue = Utils.getUserInput(urlQSP, false);
-            }
-            else if (c == 4) {
-                field = "phone_num";
-                while (true) {
-                    newValue = Utils.getUserInput(phone_numQSP, true);
-                    if (newValue.length() == 10)
-                        break;
-                    System.out.println(phone_numQSP.errorMessage);
-                }
-            }
-            else if (c == 5) {
-                field = "price_per_person";
-                newValue = Utils.getDollarAmount(price_per_personQSP);
-            }
-            else if (c == 6) {
-                field = "year_of_est";
-                newValue = Utils.getUserInput(year_of_estQSP, true);
-            }
-            else if (c == 7) {
-                field = "hours";
-                newValue = Utils.getUserInput(hoursQSP, false);
-            }
-            else if (c == 8) {
-                field = "category";
-                newValue = Utils.getUserInput(categoryQSP, false);
-            }
-            else if (c == 9) {
-                // Clear current POI's keywords from database
-                try {
-                    Statement statement = con.createStatement();
-                    statement.executeUpdate("delete from HasKeywords where pid = " + pid);
-                } catch (SQLException e) {
-                    System.out.println("Could not execute deletion from HasKeywords");
-                }
-                // TODO: Need an option to delete a keyword
-                addKeywords(con, getKeywords(words), pid);
-                break;
-            }
-            else if (c == 10)
-                break;
-            else
-                break;
-
-            updatePOIField(con, field, newValue, pid);
-            break;
-        }
+		return poi;
     }
+
+	public void updateKeywords(Connection con, Set<String> keywords, int pid) {
+		// Clear current POI's keywords from database
+		try {
+			Statement statement = con.createStatement();
+			statement.executeUpdate("delete from HasKeywords where pid = " + pid);
+		} catch (SQLException e) {
+			System.out.println("Could not execute deletion from HasKeywords");
+		}
+		addKeywords(con, keywords, pid);
+	}
+
+	public void updatePOIFields(Connection con, POIInformation poi) {
+		Map<String, String> fields = new HashMap<>();
+		fields.put("name", poi.name);
+		fields.put("address", poi.address);
+		fields.put("url", poi.url);
+		fields.put("phone_num", poi.phoneNumber);
+		fields.put("price_per_person", poi.pricePerPerson);
+		fields.put("year_of_est", poi.yearEstablished);
+		fields.put("hours", poi.hours);
+		fields.put("category", poi.category);
+
+		for (Map.Entry<String, String> entry : fields.entrySet())
+			updatePOIField(con, entry.getKey(), entry.getValue(), poi.pid);
+	}
 
     private void updatePOIField(Connection con, String field, String newValue, int pid) {
         String sql = "update POI set " + field + " = ? where pid = ?";
@@ -261,11 +133,7 @@ public class Admin extends User {
         }
     }
 
-    private TreeSet<String> getKeywords() {
-        return getKeywords(new TreeSet<String>());
-    }
-
-    private void addKeywords(Connection con, Set<String> keywords, int pid) {
+    public void addKeywords(Connection con, Set<String> keywords, int pid) {
         // Add keywords to keywords table
         try {
             Statement statement = con.createStatement();

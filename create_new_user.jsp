@@ -29,19 +29,20 @@ if (username == null || username == "") {
 <form method="post">
 	<div class="form-group">
 		<label for="username">Username:</label>
+
 		<input class="form-control" type="text" max="30" id="username" name="username" required>
 
 		<label for="password">Password:</label>
 		<input class="form-control" type="password" max="30" id="password" name="password" required>
 
 		<label for="fullname">Full name:</label>
-		<input class="form-control" type="text" max="40" id="fullname" name="fullname" required>
+		<input class="form-control" type="text" max="40" id="fullname" name="fullname" placeholder="John Psmythe" required>
 
 		<label for="address">Address:</label>
-		<input class="form-control" type="text" max="80" id="address" name="address" required>
+		<input class="form-control" type="text" max="80" id="address" name="address" placeholder="123 S. 456 E. Beaver, UT 12345" required>
 
 		<label for="phone_num">Phone number:</label>
-		<input class="form-control" type='text' id="phone_num" name="phone_num" pattern='[\(]\d{3}[\)][\-]\d{3}[\-]\d{4}' title='Phone Number (Format: (123)-456-7890)' required>
+		<input class="form-control" type='text' id="phone_num" name="phone_num" pattern='[\(]\d{3}[\)][\-]\d{3}[\-]\d{4}' title='Phone Number (Format: (123)-456-7890)' placeholder="(123)-456-7890" required>
 	</div>
 	<button type="submit" class="btn btn-default">Submit</button>
 </form>

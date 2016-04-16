@@ -162,22 +162,24 @@ public class Admin extends User {
         }
     }
 
-    public void getTopNMostTrustedUsers(Connection con) {
-        Utils.QuestionSizePair nQSP = new Utils.QuestionSizePair("How many most trusted users do you want to see: ", 10, "Invalid number");
-        int n = Integer.parseInt(Utils.getUserInput(nQSP, true));
+    public List<String[]> getTopNMostTrustedUsers(Connection con, int n) {
+		List<String[]> result = new ArrayList<>();
         try {
             String sql = "select u.name, sum(t.is_trusted) from Trust t, Users u" +
                     " where t.username2 = u.username group by username2 order by sum(is_trusted) desc limit " + n;
             PreparedStatement preparedStatement = con.prepareStatement(sql);
             ResultSet rs = preparedStatement.executeQuery();
-            System.out.println("Name | Total trusted score");
-            while (rs.next())
-                System.out.println(rs.getString(1) + " | " + rs.getInt(2));
+            while (rs.next()) {
+				String[] arr = {rs.getString(1), rs.getInt(2) + ""};
+				result.add(arr);
+			}
             rs.close();
             preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Could not get top N most trusted users");
         }
+
+		return result;
     }
 
     public void getTopNMostUsefulUsers(Connection con) {

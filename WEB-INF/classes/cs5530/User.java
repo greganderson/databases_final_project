@@ -34,43 +34,6 @@ public class User {
         }
     }
 
-    protected TreeSet<String> getKeywords(TreeSet<String> keywords) {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String keyword;
-        String choice;
-        int c;
-        keywords.remove("");
-        while (true) {
-            System.out.println("Current keywords:");
-            for (String word : keywords)
-                System.out.println(word);
-            System.out.println();
-            System.out.println("1. Add keyword");
-            System.out.println("2. Looks good");
-            try {
-                while ((choice = in.readLine()) == null && choice.length() == 0) ;
-                c = Integer.parseInt(choice);
-            } catch (IOException e) {
-                continue;
-            }
-
-            if (c == 1) {
-                System.out.print("Keyword: ");
-                try {
-                    while ((keyword = in.readLine()) == null && keyword.length() == 0) ;
-                } catch (IOException e) {
-                    continue;
-                }
-                keywords.add(keyword.toLowerCase());
-                System.out.println();
-            } else if (c == 2) {
-                System.out.println();
-                keywords.remove("");
-                return keywords;
-            }
-        }
-    }
-
     public TreeSet<String> getUserInputPOIName(Connection con) {
         TreeSet<String> pois = new TreeSet<>();
         try {

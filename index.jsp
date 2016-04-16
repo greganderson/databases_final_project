@@ -80,7 +80,6 @@ if(username == null || username == ""){
 	if (request.getParameter("admin_submit") != null)
 		is_admin = true;
 
-	Starter main = new Starter();
 	if (!is_admin) {
 		user = new RegularUser(username);
 		boolean success = user.login(username, password, false, connector.con);

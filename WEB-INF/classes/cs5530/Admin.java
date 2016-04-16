@@ -182,22 +182,24 @@ public class Admin extends User {
 		return result;
     }
 
-    public void getTopNMostUsefulUsers(Connection con) {
-        Utils.QuestionSizePair nQSP = new Utils.QuestionSizePair("How many most useful users do you want to see: ", 10, "Invalid number");
-        int n = Integer.parseInt(Utils.getUserInput(nQSP, true));
+    public List<String[]> getTopNMostUsefulUsers(Connection con, int n) {
+		List<String[]> result = new ArrayList<>();
         try {
             String sql = "select f.username, avg(r.rating) from Rates r, Feedback f" +
                     " where r.fid = f.fid group by f.username order by avg(r.rating) desc limit " + n;
             PreparedStatement preparedStatement = con.prepareStatement(sql);
             ResultSet rs = preparedStatement.executeQuery();
-            System.out.println("Name | Average usefulness score");
-            while (rs.next())
-                System.out.println(rs.getString(1) + " | " + rs.getFloat(2));
+            while (rs.next()) {
+				String[] arr = {rs.getString(1), rs.getFloat(2) + ""};
+                result.add(arr);
+			}
             rs.close();
             preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Could not get top N most useful users");
         }
+
+		return result;
     }
 
     public void getDegreesOfSeparation(Connection con) {
